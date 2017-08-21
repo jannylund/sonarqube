@@ -125,5 +125,8 @@ public class Category4Suite {
     // Used by LogsTest
     .setServerProperty("sonar.web.accessLogs.pattern", LogsTest.ACCESS_LOGS_PATTERN)
 
+    // reduce memory for Elasticsearch to 256M
+    .setServerProperty("sonar.search.javaOpts", "-Xms256m -Xmx256m")
+
     .build();
 }

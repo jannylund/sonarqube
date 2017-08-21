@@ -98,5 +98,8 @@ public class Category6Suite {
     .addPlugin(pluginArtifact("fake-billing-plugin"))
     .addPlugin(pluginArtifact("ui-extensions-plugin"))
 
+    // reduce memory for Elasticsearch to 256M
+    .setServerProperty("sonar.search.javaOpts", "-Xms256m -Xmx256m")
+
     .build();
 }
