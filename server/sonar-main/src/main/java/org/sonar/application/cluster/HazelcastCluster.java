@@ -59,6 +59,7 @@ import static org.sonar.process.cluster.ClusterObjectKeys.CLUSTER_NAME;
 import static org.sonar.process.cluster.ClusterObjectKeys.HOSTNAME;
 import static org.sonar.process.cluster.ClusterObjectKeys.IP_ADDRESSES;
 import static org.sonar.process.cluster.ClusterObjectKeys.LEADER;
+import static org.sonar.process.cluster.ClusterObjectKeys.NODE_NAME;
 import static org.sonar.process.cluster.ClusterObjectKeys.NODE_TYPE;
 import static org.sonar.process.cluster.ClusterObjectKeys.OPERATIONAL_PROCESSES;
 import static org.sonar.process.cluster.ClusterObjectKeys.SONARQUBE_VERSION;
@@ -237,6 +238,8 @@ public class HazelcastCluster implements AutoCloseable {
       .setProperty("hazelcast.logging.type", "slf4j");
 
     // Trying to resolve the hostname
+    hzConfig.getMemberAttributeConfig()
+      .setStringAttribute(NODE_NAME, clusterProperties.getNodeName());
     hzConfig.getMemberAttributeConfig()
       .setStringAttribute(HOSTNAME, getHostname());
     hzConfig.getMemberAttributeConfig()
