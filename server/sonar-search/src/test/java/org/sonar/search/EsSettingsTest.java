@@ -31,6 +31,9 @@ import org.sonar.process.ProcessProperties;
 import org.sonar.process.Props;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_ENABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_NAME;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_SEARCH_HOSTS;
 
 public class EsSettingsTest {
 
@@ -47,7 +50,7 @@ public class EsSettingsTest {
     props.set(ProcessProperties.SEARCH_PORT, "1234");
     props.set(ProcessProperties.SEARCH_HOST, "127.0.0.1");
     props.set(ProcessProperties.PATH_HOME, homeDir.getAbsolutePath());
-    props.set(ProcessProperties.CLUSTER_NAME, "sonarqube");
+    props.set(CLUSTER_NAME, "sonarqube");
 
     EsSettings esSettings = new EsSettings(props);
 
@@ -91,7 +94,7 @@ public class EsSettingsTest {
   @Test
   public void cluster_is_enabled() throws Exception {
     Props props = minProps(true);
-    props.set(ProcessProperties.CLUSTER_SEARCH_HOSTS, "1.2.3.4:9000,1.2.3.5:8080");
+    props.set(CLUSTER_SEARCH_HOSTS, "1.2.3.4:9000,1.2.3.5:8080");
     Map<String, String> settings = new EsSettings(props).build();
 
     assertThat(settings.get("discovery.zen.ping.unicast.hosts")).isEqualTo("1.2.3.4:9000,1.2.3.5:8080");
@@ -103,10 +106,12 @@ public class EsSettingsTest {
   public void incorrect_values_of_minimum_master_nodes() throws Exception {
     Props props = minProps(true);
     props.set(ProcessProperties.SEARCH_MINIMUM_MASTER_NODES, "ꝱꝲꝳପ");
+    EsSettings underTest = new EsSettings(props);
 
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage("Value of property sonar.search.minimumMasterNodes is not an integer:");
-    Map<String, String> settings = new EsSettings(props).build();
+
+    underTest.build();
   }
 
   @Test
@@ -164,7 +169,7 @@ public class EsSettingsTest {
     assertThat(settings.get("http.host")).isEqualTo("127.0.0.1");
     assertThat(settings.get("http.enabled")).isEqualTo("true");
   }
-  
+
   @Test
   public void enable_http_connector_different_host() throws Exception {
     Props props = minProps(false);
@@ -182,7 +187,7 @@ public class EsSettingsTest {
     Props props = new Props(new Properties());
     ProcessProperties.completeDefaults(props);
     props.set(ProcessProperties.PATH_HOME, homeDir.getAbsolutePath());
-    props.set(ProcessProperties.CLUSTER_ENABLED, Boolean.toString(cluster));
+    props.set(CLUSTER_ENABLED, Boolean.toString(cluster));
     return props;
   }
 }

@@ -24,17 +24,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.sonar.process.MessageException;
-import org.sonar.process.ProcessProperties;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_ENABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_HOSTS;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_SEARCH_DISABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_SEARCH_HOSTS;
 import static org.sonar.process.ProcessId.COMPUTE_ENGINE;
 import static org.sonar.process.ProcessId.ELASTICSEARCH;
 import static org.sonar.process.ProcessId.WEB_SERVER;
-import static org.sonar.process.ProcessProperties.CLUSTER_ENABLED;
-import static org.sonar.process.ProcessProperties.CLUSTER_HOSTS;
-import static org.sonar.process.ProcessProperties.CLUSTER_SEARCH_DISABLED;
-import static org.sonar.process.ProcessProperties.CLUSTER_SEARCH_HOSTS;
 import static org.sonar.process.ProcessProperties.JDBC_URL;
 import static org.sonar.process.ProcessProperties.SEARCH_HOST;
 
@@ -80,7 +79,7 @@ public class ClusterSettingsTest {
   @Test
   public void getEnabledProcesses_returns_configured_processes_in_cluster_mode() {
     settings.set(CLUSTER_ENABLED, "true");
-    settings.set(ProcessProperties.CLUSTER_SEARCH_DISABLED, "true");
+    settings.set(CLUSTER_SEARCH_DISABLED, "true");
 
     assertThat(ClusterSettings.getEnabledProcesses(settings)).containsOnly(COMPUTE_ENGINE, WEB_SERVER);
   }
@@ -162,7 +161,7 @@ public class ClusterSettingsTest {
   @Test
   public void isLocalElasticsearchEnabled_returns_false_if_local_es_node_is_disabled_in_cluster_mode() {
     settings.set(CLUSTER_ENABLED, "true");
-    settings.set(ProcessProperties.CLUSTER_SEARCH_DISABLED, "true");
+    settings.set(CLUSTER_SEARCH_DISABLED, "true");
 
     assertThat(ClusterSettings.isLocalElasticsearchEnabled(settings)).isFalse();
   }

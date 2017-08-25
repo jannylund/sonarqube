@@ -33,18 +33,20 @@ import java.util.function.Consumer;
 import org.apache.commons.lang.StringUtils;
 import org.sonar.process.MessageException;
 import org.sonar.process.ProcessId;
-import org.sonar.process.ProcessProperties;
 import org.sonar.process.Props;
 
 import static com.google.common.net.InetAddresses.forString;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.sonar.process.ProcessProperties.CLUSTER_ENABLED;
-import static org.sonar.process.ProcessProperties.CLUSTER_HOSTS;
-import static org.sonar.process.ProcessProperties.CLUSTER_NETWORK_INTERFACES;
-import static org.sonar.process.ProcessProperties.CLUSTER_SEARCH_HOSTS;
-import static org.sonar.process.ProcessProperties.CLUSTER_WEB_LEADER;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_CE_DISABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_ENABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_HOSTS;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_NETWORK_INTERFACES;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_SEARCH_DISABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_SEARCH_HOSTS;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_WEB_DISABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_WEB_LEADER;
 import static org.sonar.process.ProcessProperties.JDBC_URL;
 import static org.sonar.process.ProcessProperties.SEARCH_HOST;
 
@@ -65,9 +67,8 @@ public class ClusterSettings implements Consumer<Props> {
       throw new MessageException(format("Property [%s] is forbidden", CLUSTER_WEB_LEADER));
     }
 
-    if (props.valueAsBoolean(ProcessProperties.CLUSTER_ENABLED) &&
-      !props.valueAsBoolean(ProcessProperties.CLUSTER_SEARCH_DISABLED, false)
-      ) {
+    if (props.valueAsBoolean(CLUSTER_ENABLED) &&
+      !props.valueAsBoolean(CLUSTER_SEARCH_DISABLED, false)) {
       ensureMandatoryProperty(props, SEARCH_HOST);
       ensureNotLoopback(props, SEARCH_HOST);
     }
@@ -141,7 +142,7 @@ public class ClusterSettings implements Consumer<Props> {
     HostAndPort hostAndPort = HostAndPort.fromString(text);
     if (!InetAddresses.isInetAddress(hostAndPort.getHostText())) {
       try {
-        inetAddress =InetAddress.getByName(hostAndPort.getHostText());
+        inetAddress = InetAddress.getByName(hostAndPort.getHostText());
       } catch (UnknownHostException e) {
         throw new MessageException(format("The interface address [%s] of [%s] cannot be resolved : %s", text, key, e.getMessage()));
       }
@@ -165,14 +166,14 @@ public class ClusterSettings implements Consumer<Props> {
       return Arrays.asList(ProcessId.ELASTICSEARCH, ProcessId.WEB_SERVER, ProcessId.COMPUTE_ENGINE);
     }
     List<ProcessId> enabled = new ArrayList<>();
-    if (!settings.getProps().valueAsBoolean(ProcessProperties.CLUSTER_SEARCH_DISABLED)) {
+    if (!settings.getProps().valueAsBoolean(CLUSTER_SEARCH_DISABLED)) {
       enabled.add(ProcessId.ELASTICSEARCH);
     }
-    if (!settings.getProps().valueAsBoolean(ProcessProperties.CLUSTER_WEB_DISABLED)) {
+    if (!settings.getProps().valueAsBoolean(CLUSTER_WEB_DISABLED)) {
       enabled.add(ProcessId.WEB_SERVER);
     }
 
-    if (!settings.getProps().valueAsBoolean(ProcessProperties.CLUSTER_CE_DISABLED)) {
+    if (!settings.getProps().valueAsBoolean(CLUSTER_CE_DISABLED)) {
       enabled.add(ProcessId.COMPUTE_ENGINE);
     }
     return enabled;
@@ -180,6 +181,6 @@ public class ClusterSettings implements Consumer<Props> {
 
   public static boolean isLocalElasticsearchEnabled(AppSettings settings) {
     return !isClusterEnabled(settings.getProps()) ||
-      !settings.getProps().valueAsBoolean(ProcessProperties.CLUSTER_SEARCH_DISABLED);
+      !settings.getProps().valueAsBoolean(CLUSTER_SEARCH_DISABLED);
   }
 }

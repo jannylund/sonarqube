@@ -43,12 +43,12 @@ import org.sonar.application.AppStateListener;
 import org.sonar.process.ProcessId;
 
 import static java.util.stream.Collectors.toList;
-import static org.sonar.process.NetworkUtils.getHostName;
-import static org.sonar.process.cluster.ClusterObjectKeys.CLIENT_UUIDS;
-import static org.sonar.process.cluster.ClusterObjectKeys.HOSTNAME;
-import static org.sonar.process.cluster.ClusterObjectKeys.LEADER;
-import static org.sonar.process.cluster.ClusterObjectKeys.OPERATIONAL_PROCESSES;
-import static org.sonar.process.cluster.ClusterObjectKeys.SONARQUBE_VERSION;
+import static org.sonar.NetworkUtils.getHostName;
+import static org.sonar.cluster.ClusterObjectKeys.CLIENT_UUIDS;
+import static org.sonar.cluster.ClusterObjectKeys.HOSTNAME;
+import static org.sonar.cluster.ClusterObjectKeys.LEADER;
+import static org.sonar.cluster.ClusterObjectKeys.OPERATIONAL_PROCESSES;
+import static org.sonar.cluster.ClusterObjectKeys.SONARQUBE_VERSION;
 
 public class HazelcastCluster implements AutoCloseable {
   private final List<AppStateListener> listeners = new ArrayList<>();
@@ -137,8 +137,7 @@ public class HazelcastCluster implements AutoCloseable {
     String clusterVersion = sqVersion.get();
     if (!sqVersion.get().equals(sonarqubeVersion)) {
       throw new IllegalStateException(
-        String.format("The local version %s is not the same as the cluster %s", sonarqubeVersion, clusterVersion)
-      );
+        String.format("The local version %s is not the same as the cluster %s", sonarqubeVersion, clusterVersion));
     }
   }
 

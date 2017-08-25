@@ -18,7 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package org.sonar.ce.cluster;
+package org.sonar.cluster.internal;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;
@@ -28,13 +28,11 @@ import com.hazelcast.core.ClientListener;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import java.net.InetAddress;
-
-import static org.sonar.process.NetworkUtils.getHostName;
-import static org.sonar.process.cluster.ClusterObjectKeys.CLIENT_UUIDS;
+import org.sonar.cluster.ClusterObjectKeys;
 
 public class HazelcastTestHelper {
 
-  public static HazelcastInstance createHazelcastCluster(String clusterName, int port) {
+  public static HazelcastInstance createHazelcastCluster(String hostname, String clusterName, int port) {
     Config hzConfig = new Config();
     hzConfig.getGroupConfig().setName(clusterName);
 
@@ -66,7 +64,7 @@ public class HazelcastTestHelper {
       .setProperty("hazelcast.logging.type", "slf4j");
 
     // Trying to resolve the hostname
-    hzConfig.getMemberAttributeConfig().setStringAttribute("HOSTNAME", getHostName());
+    hzConfig.getMemberAttributeConfig().setStringAttribute("HOSTNAME", hostname);
 
     // We are not using the partition group of Hazelcast, so disabling it
     hzConfig.getPartitionGroupConfig().setEnabled(false);
@@ -84,12 +82,12 @@ public class HazelcastTestHelper {
 
     @Override
     public void clientConnected(Client client) {
-      hzInstance.getSet(CLIENT_UUIDS).add(client.getUuid());
+      hzInstance.getSet(ClusterObjectKeys.CLIENT_UUIDS).add(client.getUuid());
     }
 
     @Override
     public void clientDisconnected(Client client) {
-      hzInstance.getSet(CLIENT_UUIDS).remove(client.getUuid());
+      hzInstance.getSet(ClusterObjectKeys.CLIENT_UUIDS).remove(client.getUuid());
     }
   }
 }

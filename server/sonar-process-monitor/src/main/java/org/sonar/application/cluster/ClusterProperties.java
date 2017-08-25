@@ -31,13 +31,18 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.application.config.AppSettings;
-import org.sonar.process.ProcessProperties;
+
+import static org.sonar.cluster.ClusterProperties.CLUSTER_ENABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_HOSTS;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_NAME;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_NETWORK_INTERFACES;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_PORT;
 
 /**
  * Properties of the cluster configuration
  */
 public final class ClusterProperties {
-  static final String DEFAULT_PORT = "9003";
+  private static final String DEFAULT_PORT = "9003";
   private static final Logger LOGGER = LoggerFactory.getLogger(ClusterProperties.class);
 
   private final int port;
@@ -47,14 +52,14 @@ public final class ClusterProperties {
   private final String name;
 
   ClusterProperties(AppSettings appSettings) {
-    port = appSettings.getProps().valueAsInt(ProcessProperties.CLUSTER_PORT);
-    enabled = appSettings.getProps().valueAsBoolean(ProcessProperties.CLUSTER_ENABLED);
+    port = appSettings.getProps().valueAsInt(CLUSTER_PORT);
+    enabled = appSettings.getProps().valueAsBoolean(CLUSTER_ENABLED);
     networkInterfaces = extractNetworkInterfaces(
-      appSettings.getProps().value(ProcessProperties.CLUSTER_NETWORK_INTERFACES, "")
+      appSettings.getProps().value(CLUSTER_NETWORK_INTERFACES, "")
     );
-    name = appSettings.getProps().nonNullValue(ProcessProperties.CLUSTER_NAME);
+    name = appSettings.getProps().nonNullValue(CLUSTER_NAME);
     hosts = extractHosts(
-      appSettings.getProps().value(ProcessProperties.CLUSTER_HOSTS, "")
+      appSettings.getProps().value(CLUSTER_HOSTS, "")
     );
   }
 

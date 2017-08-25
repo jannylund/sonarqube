@@ -34,6 +34,10 @@ import org.slf4j.LoggerFactory;
 import org.sonar.process.ProcessProperties;
 import org.sonar.process.Props;
 
+import static org.sonar.cluster.ClusterProperties.CLUSTER_ENABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_NAME;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_SEARCH_HOSTS;
+
 public class EsSettings implements EsSettingsMBean {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EsSettings.class);
@@ -50,8 +54,8 @@ public class EsSettings implements EsSettingsMBean {
   EsSettings(Props props) {
     this.props = props;
 
-    this.clusterName = props.nonNullValue(ProcessProperties.CLUSTER_NAME);
-    this.clusterEnabled = props.valueAsBoolean(ProcessProperties.CLUSTER_ENABLED);
+    this.clusterName = props.nonNullValue(CLUSTER_NAME);
+    this.clusterEnabled = props.valueAsBoolean(CLUSTER_ENABLED);
     if (this.clusterEnabled) {
       this.nodeName = props.value(CLUSTER_SEARCH_NODE_NAME, "sonarqube-" + UUID.randomUUID().toString());
     } else {
@@ -155,7 +159,7 @@ public class EsSettings implements EsSettingsMBean {
       minimumMasterNodes = props.valueAsInt(ProcessProperties.SEARCH_MINIMUM_MASTER_NODES, 2);
       initialStateTimeOut = props.value(ProcessProperties.SEARCH_INITIAL_STATE_TIMEOUT, "120s");
 
-      String hosts = props.value(ProcessProperties.CLUSTER_SEARCH_HOSTS, "");
+      String hosts = props.value(CLUSTER_SEARCH_HOSTS, "");
       LOGGER.info("Elasticsearch cluster enabled. Connect to hosts [{}]", hosts);
       builder.put("discovery.zen.ping.unicast.hosts", hosts);
     }

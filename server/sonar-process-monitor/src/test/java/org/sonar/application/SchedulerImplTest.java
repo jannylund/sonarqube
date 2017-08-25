@@ -43,7 +43,6 @@ import org.sonar.application.process.JavaCommand;
 import org.sonar.application.process.ProcessLauncher;
 import org.sonar.application.process.ProcessMonitor;
 import org.sonar.process.ProcessId;
-import org.sonar.process.ProcessProperties;
 
 import static java.util.Collections.synchronizedList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,6 +50,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_ENABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_SEARCH_DISABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_WEB_DISABLED;
 import static org.sonar.process.ProcessId.COMPUTE_ENGINE;
 import static org.sonar.process.ProcessId.ELASTICSEARCH;
 import static org.sonar.process.ProcessId.WEB_SERVER;
@@ -119,7 +121,7 @@ public class SchedulerImplTest {
   }
 
   private void enableAllProcesses() {
-    settings.set(ProcessProperties.CLUSTER_ENABLED, "true");
+    settings.set(CLUSTER_ENABLED, "true");
   }
 
   @Test
@@ -247,8 +249,8 @@ public class SchedulerImplTest {
 
   @Test
   public void web_server_waits_for_remote_elasticsearch_to_be_started_if_local_es_is_disabled() throws Exception {
-    settings.set(ProcessProperties.CLUSTER_ENABLED, "true");
-    settings.set(ProcessProperties.CLUSTER_SEARCH_DISABLED, "true");
+    settings.set(CLUSTER_ENABLED, "true");
+    settings.set(CLUSTER_SEARCH_DISABLED, "true");
     SchedulerImpl underTest = newScheduler();
     underTest.schedule();
 
@@ -265,9 +267,9 @@ public class SchedulerImplTest {
 
   @Test
   public void compute_engine_waits_for_remote_elasticsearch_and_web_leader_to_be_started_if_local_es_is_disabled() throws Exception {
-    settings.set(ProcessProperties.CLUSTER_ENABLED, "true");
-    settings.set(ProcessProperties.CLUSTER_SEARCH_DISABLED, "true");
-    settings.set(ProcessProperties.CLUSTER_WEB_DISABLED, "true");
+    settings.set(CLUSTER_ENABLED, "true");
+    settings.set(CLUSTER_SEARCH_DISABLED, "true");
+    settings.set(CLUSTER_WEB_DISABLED, "true");
     SchedulerImpl underTest = newScheduler();
     underTest.schedule();
 

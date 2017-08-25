@@ -22,9 +22,10 @@ package org.sonar.application;
 import org.junit.Test;
 import org.sonar.application.cluster.AppStateClusterImpl;
 import org.sonar.application.config.TestAppSettings;
-import org.sonar.process.ProcessProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_ENABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_NAME;
 
 public class AppStateFactoryTest {
 
@@ -33,8 +34,8 @@ public class AppStateFactoryTest {
 
   @Test
   public void create_cluster_implementation_if_cluster_is_enabled() {
-    settings.set(ProcessProperties.CLUSTER_ENABLED, "true");
-    settings.set(ProcessProperties.CLUSTER_NAME, "foo");
+    settings.set(CLUSTER_ENABLED, "true");
+    settings.set(CLUSTER_NAME, "foo");
 
     AppState appState = underTest.create();
     assertThat(appState).isInstanceOf(AppStateClusterImpl.class);

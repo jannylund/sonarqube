@@ -41,12 +41,11 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
 import org.slf4j.LoggerFactory;
+import org.sonar.NetworkUtils;
 import org.sonar.application.AppStateListener;
 import org.sonar.application.config.TestAppSettings;
-import org.sonar.process.NetworkUtils;
+import org.sonar.cluster.ClusterObjectKeys;
 import org.sonar.process.ProcessId;
-import org.sonar.process.ProcessProperties;
-import org.sonar.process.cluster.ClusterObjectKeys;
 
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,13 +53,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.sonar.application.cluster.HazelcastTestHelper.closeAllHazelcastClients;
-import static org.sonar.application.cluster.HazelcastTestHelper.createHazelcastClient;
-import static org.sonar.application.cluster.HazelcastTestHelper.newClusterSettings;
-import static org.sonar.process.ProcessProperties.CLUSTER_NAME;
-import static org.sonar.process.cluster.ClusterObjectKeys.LEADER;
-import static org.sonar.process.cluster.ClusterObjectKeys.OPERATIONAL_PROCESSES;
-import static org.sonar.process.cluster.ClusterObjectKeys.SONARQUBE_VERSION;
+import static org.sonar.application.cluster.HazelcastClusterTestHelper.closeAllHazelcastClients;
+import static org.sonar.application.cluster.HazelcastClusterTestHelper.createHazelcastClient;
+import static org.sonar.application.cluster.HazelcastClusterTestHelper.newClusterSettings;
+import static org.sonar.cluster.ClusterObjectKeys.LEADER;
+import static org.sonar.cluster.ClusterObjectKeys.OPERATIONAL_PROCESSES;
+import static org.sonar.cluster.ClusterObjectKeys.SONARQUBE_VERSION;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_NAME;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_NETWORK_INTERFACES;
 
 public class HazelcastClusterTest {
   @Rule
@@ -154,7 +154,7 @@ public class HazelcastClusterTest {
     ClusterProperties clusterProperties = new ClusterProperties(testAppSettings);
     try (HazelcastCluster hzCluster = HazelcastCluster.create(clusterProperties)) {
       assertThat(hzCluster.hzInstance.getSet(ClusterObjectKeys.CLIENT_UUIDS)).isEmpty();
-      HazelcastInstance hzClient = HazelcastTestHelper.createHazelcastClient(hzCluster);
+      HazelcastInstance hzClient = HazelcastClusterTestHelper.createHazelcastClient(hzCluster);
       assertThat(hzCluster.hzInstance.getSet(ClusterObjectKeys.CLIENT_UUIDS)).containsExactly(hzClient.getLocalEndpoint().getUuid());
 
       CountDownLatch latch = new CountDownLatch(1);
@@ -238,7 +238,7 @@ public class HazelcastClusterTest {
   @Test
   public void simulate_network_cluster() throws InterruptedException {
     TestAppSettings settings = newClusterSettings();
-    settings.set(ProcessProperties.CLUSTER_NETWORK_INTERFACES, InetAddress.getLoopbackAddress().getHostAddress());
+    settings.set(CLUSTER_NETWORK_INTERFACES, InetAddress.getLoopbackAddress().getHostAddress());
     AppStateListener listener = mock(AppStateListener.class);
 
     try (AppStateClusterImpl appStateCluster = new AppStateClusterImpl(settings)) {

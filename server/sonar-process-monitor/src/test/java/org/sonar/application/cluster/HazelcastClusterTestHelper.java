@@ -27,9 +27,11 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import org.sonar.application.config.TestAppSettings;
-import org.sonar.process.ProcessProperties;
 
-public class HazelcastTestHelper {
+import static org.sonar.cluster.ClusterProperties.CLUSTER_ENABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_NAME;
+
+public class HazelcastClusterTestHelper {
 
   // Be careful this test won't work if parallel tests is used
   private static final List<HazelcastInstance> HAZELCAST_INSTANCES = new ArrayList<>();
@@ -67,8 +69,8 @@ public class HazelcastTestHelper {
 
   static TestAppSettings newClusterSettings() {
     TestAppSettings settings = new TestAppSettings();
-    settings.set(ProcessProperties.CLUSTER_ENABLED, "true");
-    settings.set(ProcessProperties.CLUSTER_NAME, "sonarqube");
+    settings.set(CLUSTER_ENABLED, "true");
+    settings.set(CLUSTER_NAME, "sonarqube");
     return settings;
   }
 }

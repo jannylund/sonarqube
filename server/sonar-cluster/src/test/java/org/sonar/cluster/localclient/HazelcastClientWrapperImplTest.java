@@ -18,7 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package org.sonar.ce.cluster;
+package org.sonar.cluster.localclient;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang.RandomStringUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -49,10 +50,11 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
 import org.slf4j.LoggerFactory;
+import org.sonar.NetworkUtils;
 import org.sonar.api.config.PropertyDefinitions;
 import org.sonar.api.config.internal.MapSettings;
-import org.sonar.process.NetworkUtils;
-import org.sonar.process.ProcessProperties;
+import org.sonar.cluster.ClusterProperties;
+import org.sonar.cluster.internal.HazelcastTestHelper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.MapEntry.entry;
@@ -70,7 +72,7 @@ public class HazelcastClientWrapperImplTest {
   @BeforeClass
   public static void setupHazelcastClusterAndHazelcastClient() {
     int port = NetworkUtils.getNextAvailablePort(InetAddress.getLoopbackAddress());
-    hzCluster = HazelcastTestHelper.createHazelcastCluster("cluster_with_client", port);
+    hzCluster = HazelcastTestHelper.createHazelcastCluster(NetworkUtils.getHostName(), "cluster_with_client", port);
 
     MapSettings settings = createClusterSettings("cluster_with_client", "localhost:" + port);
     hzClient = new HazelcastClientWrapperImpl(settings.asConfig());
@@ -114,7 +116,7 @@ public class HazelcastClientWrapperImplTest {
   @Test
   public void constructor_throws_ISE_if_CLUSTER_ENABLED_is_false() {
     MapSettings settings = createClusterSettings("sonarqube", "localhost:9003");
-    settings.setProperty(ProcessProperties.CLUSTER_ENABLED, false);
+    settings.setProperty(ClusterProperties.CLUSTER_ENABLED, false);
 
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage("Cluster is not enabled");
@@ -125,7 +127,7 @@ public class HazelcastClientWrapperImplTest {
   @Test
   public void constructor_throws_ISE_if_missing_CLUSTER_ENABLED() {
     MapSettings settings = createClusterSettings("sonarqube", "localhost:9003");
-    settings.removeProperty(ProcessProperties.CLUSTER_ENABLED);
+    settings.removeProperty(ClusterProperties.CLUSTER_ENABLED);
 
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage("Cluster is not enabled");
@@ -136,7 +138,7 @@ public class HazelcastClientWrapperImplTest {
   @Test
   public void constructor_throws_ISE_if_missing_CLUSTER_NAME() {
     MapSettings settings = createClusterSettings("sonarqube", "localhost:9003");
-    settings.removeProperty(ProcessProperties.CLUSTER_NAME);
+    settings.removeProperty(ClusterProperties.CLUSTER_NAME);
 
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage("sonar.cluster.name is missing");
@@ -147,7 +149,7 @@ public class HazelcastClientWrapperImplTest {
   @Test
   public void constructor_throws_ISE_if_missing_CLUSTER_LOCALENDPOINT() {
     MapSettings settings = createClusterSettings("sonarqube", "localhost:9003");
-    settings.removeProperty(ProcessProperties.CLUSTER_LOCALENDPOINT);
+    settings.removeProperty(ClusterProperties.CLUSTER_LOCALENDPOINT);
 
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage("LocalEndPoint have not been set");
@@ -159,7 +161,7 @@ public class HazelcastClientWrapperImplTest {
   public void client_must_connect_to_hazelcast() throws InterruptedException {
     int port = NetworkUtils.getNextAvailablePort(InetAddress.getLoopbackAddress());
     // Launch a fake Hazelcast instance
-    HazelcastInstance hzInstance = HazelcastTestHelper.createHazelcastCluster("client_must_connect_to_hazelcast", port);
+    HazelcastInstance hzInstance = HazelcastTestHelper.createHazelcastCluster(NetworkUtils.getHostName(), "client_must_connect_to_hazelcast", port);
     MapSettings settings = createClusterSettings("client_must_connect_to_hazelcast", "localhost:" + port);
 
     HazelcastClientWrapperImpl hazelcastClientWrapperImpl = new HazelcastClientWrapperImpl(settings.asConfig());
@@ -185,9 +187,9 @@ public class HazelcastClientWrapperImplTest {
         Arrays.asList(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10)));
       Map<String, Set<String>> replicatedMap = hzClient.getReplicatedMap("TEST1");
       replicatedMap.put("KEY1", ImmutableSet.copyOf(setTest));
-      assertThat(hzCluster.getReplicatedMap("TEST1"))
+      Assertions.assertThat(hzCluster.getReplicatedMap("TEST1"))
         .containsOnlyKeys("KEY1");
-      assertThat(hzCluster.getReplicatedMap("TEST1").get("KEY1"))
+      Assertions.assertThat(hzCluster.getReplicatedMap("TEST1").get("KEY1"))
         .isEqualTo(setTest);
     } finally {
       hzClient.stop();
@@ -243,9 +245,9 @@ public class HazelcastClientWrapperImplTest {
     try {
       hzClient.start();
       HazelcastClientInstanceImpl realClient = ((HazelcastClientProxy) hzClient.hzInstance).client;
-      assertThat(realClient.getClientConfig().getProperty("hazelcast.tcp.join.port.try.count")).isEqualTo("10");
-      assertThat(realClient.getClientConfig().getProperty("hazelcast.phone.home.enabled")).isEqualTo("false");
-      assertThat(realClient.getClientConfig().getProperty("hazelcast.logging.type")).isEqualTo("slf4j");
+      Assertions.assertThat(realClient.getClientConfig().getProperty("hazelcast.tcp.join.port.try.count")).isEqualTo("10");
+      Assertions.assertThat(realClient.getClientConfig().getProperty("hazelcast.phone.home.enabled")).isEqualTo("false");
+      Assertions.assertThat(realClient.getClientConfig().getProperty("hazelcast.logging.type")).isEqualTo("slf4j");
     } finally {
       hzClient.stop();
     }
@@ -266,9 +268,9 @@ public class HazelcastClientWrapperImplTest {
       hzClient.stop();
       memoryAppender.stop();
     }
-    assertThat(memoryAppender.events).isNotEmpty();
+    Assertions.assertThat(memoryAppender.events).isNotEmpty();
     memoryAppender.events.stream().forEach(
-      e -> assertThat(e.getLoggerName()).startsWith("com.hazelcast"));
+      e -> Assertions.assertThat(e.getLoggerName()).startsWith("com.hazelcast"));
   }
 
   private class ClientListenerImpl implements ClientListener {
@@ -287,9 +289,9 @@ public class HazelcastClientWrapperImplTest {
 
   private static MapSettings createClusterSettings(String name, String localEndPoint) {
     return new MapSettings(new PropertyDefinitions())
-      .setProperty(ProcessProperties.CLUSTER_NAME, name)
-      .setProperty(ProcessProperties.CLUSTER_LOCALENDPOINT, localEndPoint)
-      .setProperty(ProcessProperties.CLUSTER_ENABLED, "true");
+      .setProperty(ClusterProperties.CLUSTER_NAME, name)
+      .setProperty(ClusterProperties.CLUSTER_LOCALENDPOINT, localEndPoint)
+      .setProperty(ClusterProperties.CLUSTER_ENABLED, "true");
   }
 
   private class MemoryAppender<E> extends AppenderBase<E> {

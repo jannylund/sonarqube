@@ -36,6 +36,11 @@ import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 import org.sonar.process.ProcessProperties;
 
+import static org.sonar.cluster.ClusterProperties.CLUSTER_ENABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_NAME;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_SEARCH_DISABLED;
+import static org.sonar.cluster.ClusterProperties.CLUSTER_SEARCH_HOSTS;
+
 @ComputeEngineSide
 @ServerSide
 public class EsClientProvider extends ProviderAdapter {
@@ -50,13 +55,13 @@ public class EsClientProvider extends ProviderAdapter {
       org.elasticsearch.common.settings.Settings.Builder esSettings = org.elasticsearch.common.settings.Settings.builder();
 
       // mandatory property defined by bootstrap process
-      esSettings.put("cluster.name", config.get(ProcessProperties.CLUSTER_NAME).get());
+      esSettings.put("cluster.name", config.get(CLUSTER_NAME).get());
 
-      boolean clusterEnabled = config.getBoolean(ProcessProperties.CLUSTER_ENABLED).orElse(false);
-      if (clusterEnabled && config.getBoolean(ProcessProperties.CLUSTER_SEARCH_DISABLED).orElse(false)) {
+      boolean clusterEnabled = config.getBoolean(CLUSTER_ENABLED).orElse(false);
+      if (clusterEnabled && config.getBoolean(CLUSTER_SEARCH_DISABLED).orElse(false)) {
         esSettings.put("client.transport.sniff", true);
         nativeClient = new PreBuiltTransportClient(esSettings.build());
-        Arrays.stream(config.getStringArray(ProcessProperties.CLUSTER_SEARCH_HOSTS))
+        Arrays.stream(config.getStringArray(CLUSTER_SEARCH_HOSTS))
           .map(HostAndPort::fromString)
           .forEach(h -> addHostToClient(h, nativeClient));
         LOGGER.info("Connected to remote Elasticsearch: [{}]", displayedAddresses(nativeClient));

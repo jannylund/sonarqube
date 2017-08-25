@@ -18,9 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package org.sonar.ce.cluster;
+package org.sonar.cluster.localclient;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
@@ -30,11 +31,10 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import org.picocontainer.Startable;
 import org.sonar.api.config.Configuration;
-import org.sonar.process.ProcessProperties;
+import org.sonar.cluster.ClusterObjectKeys;
+import org.sonar.cluster.ClusterProperties;
 
-import static com.google.common.base.Preconditions.checkState;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.sonar.process.cluster.ClusterObjectKeys.CLIENT_UUIDS;
 
 /**
  * This class will connect as a Hazelcast client to the local instance of Hazelcluster
@@ -47,13 +47,13 @@ public class HazelcastClientWrapperImpl implements Startable, HazelcastClientWra
   protected HazelcastInstance hzInstance;
 
   public HazelcastClientWrapperImpl(Configuration config) {
-    boolean clusterEnabled = config.getBoolean(ProcessProperties.CLUSTER_ENABLED).orElse(false);
-    String clusterName = config.get(ProcessProperties.CLUSTER_NAME).orElse(null);
-    String clusterLocalEndPoint = config.get(ProcessProperties.CLUSTER_LOCALENDPOINT).orElse(null);
+    boolean clusterEnabled = config.getBoolean(ClusterProperties.CLUSTER_ENABLED).orElse(false);
+    String clusterName = config.get(ClusterProperties.CLUSTER_NAME).orElse(null);
+    String clusterLocalEndPoint = config.get(ClusterProperties.CLUSTER_LOCALENDPOINT).orElse(null);
 
-    checkState(clusterEnabled, "Cluster is not enabled");
-    checkState(isNotEmpty(clusterLocalEndPoint), "LocalEndPoint have not been set");
-    checkState(isNotEmpty(clusterName), "sonar.cluster.name is missing");
+    Preconditions.checkState(clusterEnabled, "Cluster is not enabled");
+    Preconditions.checkState(isNotEmpty(clusterLocalEndPoint), "LocalEndPoint have not been set");
+    Preconditions.checkState(isNotEmpty(clusterName), "sonar.cluster.name is missing");
 
     hzConfig = new ClientConfig();
     hzConfig.getGroupConfig().setName(clusterName);
@@ -96,7 +96,7 @@ public class HazelcastClientWrapperImpl implements Startable, HazelcastClientWra
 
   @Override
   public Set<String> getConnectedClients() {
-    return hzInstance.getSet(CLIENT_UUIDS);
+    return hzInstance.getSet(ClusterObjectKeys.CLIENT_UUIDS);
   }
 
   @Override
