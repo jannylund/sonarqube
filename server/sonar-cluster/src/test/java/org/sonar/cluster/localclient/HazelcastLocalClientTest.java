@@ -59,7 +59,7 @@ import org.sonar.cluster.internal.HazelcastTestHelper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.MapEntry.entry;
 
-public class HazelcastClientWrapperImplTest {
+public class HazelcastLocalClientTest {
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
@@ -67,7 +67,7 @@ public class HazelcastClientWrapperImplTest {
   public TestRule safeguardTimeout = new DisableOnDebug(Timeout.seconds(60));
 
   private static HazelcastInstance hzCluster;
-  private static HazelcastClientWrapperImpl hzClient;
+  private static HazelcastLocalClient hzClient;
 
   @BeforeClass
   public static void setupHazelcastClusterAndHazelcastClient() {
@@ -75,7 +75,7 @@ public class HazelcastClientWrapperImplTest {
     hzCluster = HazelcastTestHelper.createHazelcastCluster(NetworkUtils.getHostName(), "cluster_with_client", port);
 
     MapSettings settings = createClusterSettings("cluster_with_client", "localhost:" + port);
-    hzClient = new HazelcastClientWrapperImpl(settings.asConfig());
+    hzClient = new HazelcastLocalClient(settings.asConfig());
   }
 
   @AfterClass
@@ -95,7 +95,7 @@ public class HazelcastClientWrapperImplTest {
   @Test
   public void start_throws_ISE_if_LOCALENDPOINT_is_incorrect() {
     MapSettings settings = createClusterSettings("sonarqube", "\u4563\u1432\u1564");
-    HazelcastClientWrapperImpl hzClient = new HazelcastClientWrapperImpl(settings.asConfig());
+    HazelcastLocalClient hzClient = new HazelcastLocalClient(settings.asConfig());
 
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage("Unable to connect to any address in the config! The following addresses were tried:");
@@ -110,7 +110,7 @@ public class HazelcastClientWrapperImplTest {
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage("LocalEndPoint have not been set");
 
-    new HazelcastClientWrapperImpl(settings.asConfig());
+    new HazelcastLocalClient(settings.asConfig());
   }
 
   @Test
@@ -121,7 +121,7 @@ public class HazelcastClientWrapperImplTest {
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage("Cluster is not enabled");
 
-    new HazelcastClientWrapperImpl(settings.asConfig());
+    new HazelcastLocalClient(settings.asConfig());
   }
 
   @Test
@@ -132,7 +132,7 @@ public class HazelcastClientWrapperImplTest {
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage("Cluster is not enabled");
 
-    new HazelcastClientWrapperImpl(settings.asConfig());
+    new HazelcastLocalClient(settings.asConfig());
   }
 
   @Test
@@ -143,7 +143,7 @@ public class HazelcastClientWrapperImplTest {
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage("sonar.cluster.name is missing");
 
-    new HazelcastClientWrapperImpl(settings.asConfig());
+    new HazelcastLocalClient(settings.asConfig());
   }
 
   @Test
@@ -154,7 +154,7 @@ public class HazelcastClientWrapperImplTest {
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage("LocalEndPoint have not been set");
 
-    new HazelcastClientWrapperImpl(settings.asConfig());
+    new HazelcastLocalClient(settings.asConfig());
   }
 
   @Test
@@ -164,7 +164,7 @@ public class HazelcastClientWrapperImplTest {
     HazelcastInstance hzInstance = HazelcastTestHelper.createHazelcastCluster(NetworkUtils.getHostName(), "client_must_connect_to_hazelcast", port);
     MapSettings settings = createClusterSettings("client_must_connect_to_hazelcast", "localhost:" + port);
 
-    HazelcastClientWrapperImpl hazelcastClientWrapperImpl = new HazelcastClientWrapperImpl(settings.asConfig());
+    HazelcastLocalClient hazelcastClientWrapperImpl = new HazelcastLocalClient(settings.asConfig());
     ClientListenerImpl clientListener = new ClientListenerImpl();
     hzInstance.getClientService().addClientListener(clientListener);
     try {

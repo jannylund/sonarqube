@@ -41,7 +41,7 @@ import org.sonar.ce.CeDistributedInformationImpl;
 import org.sonar.ce.StandaloneCeDistributedInformation;
 import org.sonar.cluster.ClusterProperties;
 import org.sonar.cluster.internal.HazelcastTestHelper;
-import org.sonar.cluster.localclient.HazelcastClientWrapperImpl;
+import org.sonar.cluster.localclient.HazelcastLocalClient;
 import org.sonar.db.DbTester;
 import org.sonar.db.property.PropertyDto;
 import org.sonar.process.ProcessId;
@@ -94,7 +94,7 @@ public class ComputeEngineContainerImplTest {
     assertThat(
       picoContainer.getComponentAdapters().stream()
         .map(ComponentAdapter::getComponentImplementation)
-        .collect(Collectors.toList())).contains((Class) HazelcastClientWrapperImpl.class,
+        .collect(Collectors.toList())).contains((Class) HazelcastLocalClient.class,
           (Class) CeDistributedInformationImpl.class);
     underTest.stop();
   }
@@ -143,7 +143,7 @@ public class ComputeEngineContainerImplTest {
     assertThat(
       picoContainer.getComponentAdapters().stream()
         .map(ComponentAdapter::getComponentImplementation)
-        .collect(Collectors.toList())).doesNotContain((Class) HazelcastClientWrapperImpl.class,
+        .collect(Collectors.toList())).doesNotContain((Class) HazelcastLocalClient.class,
           (Class) CeDistributedInformationImpl.class).contains(
             (Class) StandaloneCeDistributedInformation.class);
     assertThat(picoContainer.getParent().getParent().getParent().getParent()).isNull();
