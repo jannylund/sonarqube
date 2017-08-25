@@ -54,6 +54,7 @@ import org.sonar.ce.queue.PurgeCeActivities;
 import org.sonar.ce.settings.ProjectConfigurationFactory;
 import org.sonar.ce.taskprocessor.CeTaskProcessorModule;
 import org.sonar.ce.user.CeUserSession;
+import org.sonar.cluster.ClusterProperties;
 import org.sonar.cluster.localclient.HazelcastLocalClient;
 import org.sonar.core.component.DefaultResourceTypes;
 import org.sonar.core.config.ConfigurationProvider;
@@ -158,35 +159,23 @@ public class ComputeEngineContainerImpl implements ComputeEngineContainer {
   @Override
   public ComputeEngineContainer start(Props props) {
     this.level1 = new ComponentContainer();
-    this.level1
-      .add(props.rawProperties())
-      .add(level1Components())
-      .add(toArray(CorePropertyDefinitions.all()));
+    populateLevel1(this.level1, props);
     configureFromModules(this.level1);
     this.level1.startComponents();
 
     ComponentContainer level2 = this.level1.createChild();
-    level2.add(level2Components());
+    populateLevel2(level2);
     configureFromModules(level2);
     level2.startComponents();
 
     ComponentContainer level3 = level2.createChild();
-    level3.add(level3Components());
+    populateLevel3(level3);
     configureFromModules(level3);
     level3.startComponents();
 
     this.level4 = level3.createChild();
-    this.level4.add(level4Components());
+    populateLevel4(this.level4, props);
 
-    // TODO refactoring levelXComponents()
-    if (props.valueAsBoolean("sonar.cluster.enabled")) {
-      this.level4.add(
-        HazelcastLocalClient.class,
-        CeDistributedInformationImpl.class);
-    } else {
-      this.level4.add(
-        StandaloneCeDistributedInformation.class);
-    }
     configureFromModules(this.level4);
     ServerExtensionInstaller extensionInstaller = this.level4.getComponentByType(ServerExtensionInstaller.class);
     extensionInstaller.installExtensions(this.level4);
@@ -220,9 +209,10 @@ public class ComputeEngineContainerImpl implements ComputeEngineContainer {
     return level4;
   }
 
-  private static Object[] level1Components() {
+  private static void populateLevel1(ComponentContainer container, Props props) {
     Version apiVersion = ApiVersion.load(System2.INSTANCE);
-    return new Object[] {
+    container.add(
+      props.rawProperties(),
       ThreadLocalSettings.class,
       new ConfigurationProvider(),
       new SonarQubeVersion(apiVersion),
@@ -259,12 +249,12 @@ public class ComputeEngineContainerImpl implements ComputeEngineContainer {
       // issues
       IssueIndex.class,
 
-      new OkHttpClientProvider()
-    };
+      new OkHttpClientProvider());
+    container.add(toArray(CorePropertyDefinitions.all()));
   }
 
-  private static Object[] level2Components() {
-    return new Object[] {
+  private static void populateLevel2(ComponentContainer container) {
+    container.add(
       MigrationConfigurationModule.class,
       DatabaseVersion.class,
       DatabaseServerCompatibility.class,
@@ -288,22 +278,21 @@ public class ComputeEngineContainerImpl implements ComputeEngineContainer {
       // depends on plugins
       DefaultI18n.class, // used by RuleI18nManager
       RuleI18nManager.class, // used by DebtRulesXMLImporter
-      Durations.class, // used in Web Services and DebtCalculator
-    };
+      Durations.class // used in Web Services and DebtCalculator
+    );
   }
 
-  private static Object[] level3Components() {
-    return new Object[] {
+  private static void populateLevel3(ComponentContainer container) {
+    container.add(
       new StartupMetadataProvider(),
       ServerIdManager.class,
       UriReader.class,
       ServerImpl.class,
-      DefaultOrganizationProviderImpl.class
-    };
+      DefaultOrganizationProviderImpl.class);
   }
 
-  private static Object[] level4Components() {
-    return new Object[] {
+  private static void populateLevel4(ComponentContainer container, Props props) {
+    container.add(
       ResourceTypes.class,
       DefaultResourceTypes.get(),
       Periods.class,
@@ -409,8 +398,15 @@ public class ComputeEngineContainerImpl implements ComputeEngineContainer {
       ProjectConfigurationFactory.class,
 
       // cleaning
-      CeCleaningModule.class
-    };
+      CeCleaningModule.class);
+
+    if (props.valueAsBoolean(ClusterProperties.CLUSTER_ENABLED)) {
+      container.add(
+        HazelcastLocalClient.class,
+        CeDistributedInformationImpl.class);
+    } else {
+      container.add(StandaloneCeDistributedInformation.class);
+    }
   }
 
   private static Object[] startupComponents() {
