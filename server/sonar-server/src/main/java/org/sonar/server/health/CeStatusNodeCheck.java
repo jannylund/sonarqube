@@ -19,41 +19,28 @@
  */
 package org.sonar.server.health;
 
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
-import org.sonar.db.DbClient;
-import org.sonar.db.DbSession;
-import org.sonar.db.IsAliveMapper;
+import org.sonar.server.app.ProcessCommandWrapper;
 
 import static org.sonar.server.health.Health.newHealthCheckBuilder;
 
-/**
- * Checks Web Server can connect to the Database.
- */
-public class DbConnectionCheck implements HealthCheck {
-  private static final Logger LOGGER = Loggers.get(DbConnectionCheck.class);
-  private static final Health RED_HEALTH = newHealthCheckBuilder().setStatus(Health.Status.RED).addCause("Can't connect to DB").build();
+public class CeStatusNodeCheck implements NodeHealthCheck {
+  private static final Health RED_HEALTH = newHealthCheckBuilder()
+    .setStatus(Health.Status.RED)
+    .addCause("Compute Engine is not operational")
+    .build();
 
-  private final DbClient dbClient;
+  private final ProcessCommandWrapper processCommandWrapper;
 
-  public DbConnectionCheck(DbClient dbClient) {
-    this.dbClient = dbClient;
+  public CeStatusNodeCheck(ProcessCommandWrapper processCommandWrapper) {
+    this.processCommandWrapper = processCommandWrapper;
   }
 
   @Override
   public Health check() {
-    if (isConnectedToDB()) {
+    if (processCommandWrapper.isCeOperational()) {
       return Health.GREEN;
     }
-    return RED_HEALTH;
-  }
 
-  private boolean isConnectedToDB() {
-    try (DbSession dbSession = dbClient.openSession(false)) {
-      return dbSession.getMapper(IsAliveMapper.class).isAlive() == IsAliveMapper.IS_ALIVE_RETURNED_VALUE;
-    } catch (RuntimeException e) {
-      LOGGER.trace("DB connection is down", e);
-      return false;
-    }
+    return RED_HEALTH;
   }
 }

@@ -20,18 +20,32 @@
 package org.sonar.server.health;
 
 import org.junit.Test;
+import org.sonar.server.app.ProcessCommandWrapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-public class WebServerSafemodeCheckTest {
-  private WebServerSafemodeCheck underTest = new WebServerSafemodeCheck();
+public class CeStatusNodeCheckTest {
+  private ProcessCommandWrapper processCommandWrapper = mock(ProcessCommandWrapper.class);
+  private CeStatusNodeCheck underTest = new CeStatusNodeCheck(processCommandWrapper);
 
   @Test
-  public void always_returns_RED_status_with_cause() {
+  public void check_returns_GREEN_status_without_cause_if_ce_is_operational() {
+    when(processCommandWrapper.isCeOperational()).thenReturn(true);
+
+    Health health = underTest.check();
+
+    assertThat(health).isEqualTo(Health.GREEN);
+  }
+
+  @Test
+  public void check_returns_RED_status_with_cause_if_ce_is_not_operational() {
+    when(processCommandWrapper.isCeOperational()).thenReturn(false);
+
     Health health = underTest.check();
 
     assertThat(health.getStatus()).isEqualTo(Health.Status.RED);
-    assertThat(health.getCauses()).containsOnly("SonarQube webserver is not up");
-
+    assertThat(health.getCauses()).containsOnly("Compute Engine is not operational");
   }
 }
