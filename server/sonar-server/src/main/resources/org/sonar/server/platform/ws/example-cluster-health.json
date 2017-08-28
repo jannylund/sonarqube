@@ -1,0 +1,8 @@
+{
+  "health": "RED",
+  "causes": [
+    {
+      "message": "Application node app-1 is RED"
+    }
+  ]
+}

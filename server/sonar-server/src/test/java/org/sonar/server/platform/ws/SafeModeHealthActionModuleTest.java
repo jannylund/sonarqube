@@ -27,8 +27,8 @@ import org.picocontainer.ComponentAdapter;
 import org.sonar.core.platform.ComponentContainer;
 import org.sonar.server.health.DbConnectionNodeCheck;
 import org.sonar.server.health.EsStatusCheck;
-import org.sonar.server.health.NodeHealthCheck;
 import org.sonar.server.health.HealthCheckerImpl;
+import org.sonar.server.health.NodeHealthCheck;
 import org.sonar.server.health.WebServerSafemodeNodeCheck;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +44,10 @@ public class SafeModeHealthActionModuleTest {
 
     assertThat(classesAddedToContainer(container))
       .contains(HealthCheckerImpl.class)
-      .contains(HealthAction.class);
+      .contains(HealthAction.class)
+      .contains(ClusterHealthActionSupport.class)
+      .contains(SafeModeClusterHealthAction.class)
+      .doesNotContain(ClusterHealthAction.class);
   }
 
   @Test

@@ -28,8 +28,8 @@ import org.sonar.core.platform.ComponentContainer;
 import org.sonar.server.health.CeStatusNodeCheck;
 import org.sonar.server.health.DbConnectionNodeCheck;
 import org.sonar.server.health.EsStatusCheck;
-import org.sonar.server.health.NodeHealthCheck;
 import org.sonar.server.health.HealthCheckerImpl;
+import org.sonar.server.health.NodeHealthCheck;
 import org.sonar.server.health.WebServerStatusNodeCheck;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,7 +45,10 @@ public class HealthActionModuleTest {
 
     assertThat(classesAddedToContainer(container))
       .contains(HealthCheckerImpl.class)
-      .contains(HealthAction.class);
+      .contains(HealthAction.class)
+      .contains(ClusterHealthAction.class)
+      .contains(ClusterHealthActionSupport.class)
+      .doesNotContain(SafeModeClusterHealthAction.class);
   }
 
   @Test

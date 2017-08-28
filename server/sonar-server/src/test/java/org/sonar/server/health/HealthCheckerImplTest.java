@@ -29,6 +29,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
+import org.sonar.api.config.internal.MapSettings;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.sonar.server.health.Health.Status.GREEN;
@@ -37,11 +38,12 @@ import static org.sonar.server.health.Health.Status.YELLOW;
 
 public class HealthCheckerImplTest {
 
+  private final MapSettings mapSettings = new MapSettings();
   private final Random random = new Random();
 
   @Test
   public void check_returns_green_status_without_any_cause_when_there_is_no_HealthCheck() {
-    HealthCheckerImpl underTest = new HealthCheckerImpl();
+    HealthCheckerImpl underTest = new HealthCheckerImpl(mapSettings.asConfig());
 
     assertThat(underTest.checkNode()).isEqualTo(Health.GREEN);
   }
@@ -95,14 +97,14 @@ public class HealthCheckerImplTest {
       .toArray(NodeHealthCheck[]::new);
     String[] expected = Arrays.stream(nodeHealthChecks).map(NodeHealthCheck::check).flatMap(s -> s.getCauses().stream()).toArray(String[]::new);
 
-    HealthCheckerImpl underTest = new HealthCheckerImpl(nodeHealthChecks);
+    HealthCheckerImpl underTest = new HealthCheckerImpl(mapSettings.asConfig(), nodeHealthChecks);
 
     assertThat(underTest.checkNode().getCauses()).containsOnly(expected);
   }
 
   private HealthCheckerImpl newHealthCheckerImpl(Stream<Health.Status> statuses) {
     Stream<HardcodedHealthNodeCheck> staticHealthCheckStream = statuses.map(HardcodedHealthNodeCheck::new);
-    return new HealthCheckerImpl(staticHealthCheckStream.map(NodeHealthCheck.class::cast).toArray(NodeHealthCheck[]::new));
+    return new HealthCheckerImpl(mapSettings.asConfig(), staticHealthCheckStream.map(NodeHealthCheck.class::cast).toArray(NodeHealthCheck[]::new));
   }
 
   private class HardcodedHealthNodeCheck implements NodeHealthCheck {

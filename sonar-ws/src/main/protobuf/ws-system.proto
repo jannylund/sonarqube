@@ -30,6 +30,12 @@ message HealthResponse {
   repeated Cause causes = 2;
 }
 
+// GET api/system/cluster_health
+message ClusterHealthResponse {
+  optional Health health = 1;
+  repeated Cause causes = 2;
+}
+
 message Cause {
   optional string message = 1;
 }

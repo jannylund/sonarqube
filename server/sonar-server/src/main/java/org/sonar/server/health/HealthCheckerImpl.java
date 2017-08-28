@@ -19,12 +19,14 @@
  */
 package org.sonar.server.health;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
+import org.sonar.api.config.Configuration;
+import org.sonar.process.ProcessProperties;
 
-import static java.util.Collections.emptyList;
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.ImmutableList.copyOf;
 import static org.sonar.server.health.Health.newHealthCheckBuilder;
 
 /**
@@ -32,22 +34,26 @@ import static org.sonar.server.health.Health.newHealthCheckBuilder;
  * and aggregates their results.
  */
 public class HealthCheckerImpl implements HealthChecker {
+  private final Configuration configuration;
   private final List<NodeHealthCheck> nodeHealthChecks;
   private final List<ClusterHealthCheck> clusterHealthChecks;
 
-  public HealthCheckerImpl(NodeHealthCheck... nodeHealthChecks) {
-    this.nodeHealthChecks = Arrays.asList(nodeHealthChecks);
-    this.clusterHealthChecks = emptyList();
+  public HealthCheckerImpl(Configuration configuration) {
+    this(configuration, new NodeHealthCheck[0], new ClusterHealthCheck[0]);
   }
 
-  public HealthCheckerImpl(ClusterHealthCheck... clusterHealthChecks) {
-    this.clusterHealthChecks = Arrays.asList(clusterHealthChecks);
-    this.nodeHealthChecks = emptyList();
+  public HealthCheckerImpl(Configuration configuration, NodeHealthCheck[] nodeHealthChecks) {
+    this(configuration, nodeHealthChecks, new ClusterHealthCheck[0]);
   }
 
-  public HealthCheckerImpl(NodeHealthCheck[] nodeHealthChecks, ClusterHealthCheck[] clusterHealthChecks) {
-    this.nodeHealthChecks = Arrays.asList(nodeHealthChecks);
-    this.clusterHealthChecks = Arrays.asList(clusterHealthChecks);
+  public HealthCheckerImpl(Configuration configuration, ClusterHealthCheck[] clusterHealthChecks) {
+    this(configuration, new NodeHealthCheck[0], clusterHealthChecks);
+  }
+
+  public HealthCheckerImpl(Configuration configuration, NodeHealthCheck[] nodeHealthChecks, ClusterHealthCheck[] clusterHealthChecks) {
+    this.configuration = configuration;
+    this.nodeHealthChecks = copyOf(nodeHealthChecks);
+    this.clusterHealthChecks = copyOf(clusterHealthChecks);
   }
 
   @Override
@@ -58,6 +64,8 @@ public class HealthCheckerImpl implements HealthChecker {
 
   @Override
   public Health checkCluster() {
+    checkState(configuration.getBoolean(ProcessProperties.CLUSTER_ENABLED).orElse(false), "Clustering is not enabled");
+
     return clusterHealthChecks.stream().map(ClusterHealthCheck::check)
       .reduce(Health.GREEN, HealthReducer.INSTANCE);
   }

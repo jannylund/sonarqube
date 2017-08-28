@@ -29,7 +29,7 @@ public interface HealthChecker {
   /**
    * Perform a check of the health of the SonarQube cluster.
    *
-   * @throws IllegalStateException if clustering is not enabled for the current node.
+   * @throws IllegalStateException if clustering is not enabled.
    */
   Health checkCluster();
 }

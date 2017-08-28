@@ -60,6 +60,7 @@ public class UserSessionInitializer {
     "/maintenance/*", "/setup/*",
     "/sessions/*", "/oauth2/callback/*",
     "/api/system/db_migration_status", "/api/system/status", "/api/system/migrate_db", "/api/system/health",
+    "/api/system/cluster_health",
     "/api/server/version",
     "/api/users/identity_providers", "/api/l10n/index",
     LOGIN_URL, LOGOUT_URL, VALIDATE_URL);

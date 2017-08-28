@@ -33,11 +33,15 @@ public class HealthActionModule extends Module {
       // NodeHealthCheck implementations
       WebServerStatusNodeCheck.class,
       DbConnectionNodeCheck.class,
-      EsStatusCheck.class,
       CeStatusNodeCheck.class,
+
+      // NodeHealthCheck and ClusterHealthCheck implementations
+      EsStatusCheck.class,
 
       HealthCheckerImpl.class,
 
-      HealthAction.class);
+      HealthAction.class,
+      ClusterHealthActionSupport.class,
+      ClusterHealthAction.class);
   }
 }
