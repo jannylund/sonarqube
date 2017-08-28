@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
 
+import static java.util.Collections.emptyList;
 import static org.sonar.server.health.Health.newHealthCheckBuilder;
 
 /**
@@ -32,14 +33,32 @@ import static org.sonar.server.health.Health.newHealthCheckBuilder;
  */
 public class HealthCheckerImpl implements HealthChecker {
   private final List<NodeHealthCheck> nodeHealthChecks;
+  private final List<ClusterHealthCheck> clusterHealthChecks;
 
   public HealthCheckerImpl(NodeHealthCheck... nodeHealthChecks) {
     this.nodeHealthChecks = Arrays.asList(nodeHealthChecks);
+    this.clusterHealthChecks = emptyList();
+  }
+
+  public HealthCheckerImpl(ClusterHealthCheck... clusterHealthChecks) {
+    this.clusterHealthChecks = Arrays.asList(clusterHealthChecks);
+    this.nodeHealthChecks = emptyList();
+  }
+
+  public HealthCheckerImpl(NodeHealthCheck[] nodeHealthChecks, ClusterHealthCheck[] clusterHealthChecks) {
+    this.nodeHealthChecks = Arrays.asList(nodeHealthChecks);
+    this.clusterHealthChecks = Arrays.asList(clusterHealthChecks);
   }
 
   @Override
   public Health checkNode() {
     return nodeHealthChecks.stream().map(NodeHealthCheck::check)
+      .reduce(Health.GREEN, HealthReducer.INSTANCE);
+  }
+
+  @Override
+  public Health checkCluster() {
+    return clusterHealthChecks.stream().map(ClusterHealthCheck::check)
       .reduce(Health.GREEN, HealthReducer.INSTANCE);
   }
 

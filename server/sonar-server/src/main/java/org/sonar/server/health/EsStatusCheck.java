@@ -27,7 +27,7 @@ import static org.sonar.server.health.Health.newHealthCheckBuilder;
 /**
  * Checks the ElasticSearch cluster status.
  */
-public class EsStatusCheck implements NodeHealthCheck {
+public class EsStatusCheck implements NodeHealthCheck, ClusterHealthCheck {
   private static final Health YELLOW_HEALTH = newHealthCheckBuilder()
     .setStatus(Health.Status.YELLOW)
     .addCause("Elasticsearch status is YELLOW")
