@@ -17,17 +17,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 import PerspectiveSelect from '../PerspectiveSelect';
 
 it('should render correctly', () => {
-  expect(shallow(<PerspectiveSelect view="overall" />)).toMatchSnapshot();
+  expect(shallow(<PerspectiveSelect onChange={jest.fn()} view="overall" />)).toMatchSnapshot();
 });
 
 it('should render with coverage selected', () => {
   expect(
-    shallow(<PerspectiveSelect view="visualizations" visualization="coverage" />)
+    shallow(
+      <PerspectiveSelect onChange={jest.fn()} view="visualizations" visualization="coverage" />
+    )
   ).toMatchSnapshot();
 });
 
@@ -35,9 +37,9 @@ it('should handle perspective change correctly', () => {
   const onChange = jest.fn();
   const instance = shallow(
     <PerspectiveSelect view="visualizations" visualization="coverage" onChange={onChange} />
-  ).instance();
-  instance.handleChange({ value: 'overall', type: 'view' });
-  instance.handleChange({ value: 'leak', type: 'view' });
-  instance.handleChange({ value: 'coverage', type: 'visualization' });
+  ).instance() as PerspectiveSelect;
+  instance.handleChange({ label: 'overall', value: 'overall', type: 'view' });
+  instance.handleChange({ label: 'leak', value: 'leak', type: 'view' });
+  instance.handleChange({ label: 'coverage', value: 'coverage', type: 'visualization' });
   expect(onChange.mock.calls).toMatchSnapshot();
 });

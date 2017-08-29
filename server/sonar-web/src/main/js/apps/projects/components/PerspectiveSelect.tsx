@@ -17,33 +17,32 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
-import Select from 'react-select';
-import PerspectiveSelectOption from './PerspectiveSelectOption';
+import * as React from 'react';
+import * as Select from 'react-select';
+import PerspectiveSelectOption, { Option } from './PerspectiveSelectOption';
 import { translate } from '../../../helpers/l10n';
 import { VIEWS, VISUALIZATIONS } from '../utils';
 
-/*::
-export type Option = { label: string, type: string, value: string };
-*/
+interface Props {
+  className?: string;
+  onChange: (x: { view: string; visualization?: string }) => void;
+  view: string;
+  visualization?: string;
+}
 
-/*::
-type Props = {|
-  className?: string,
-  onChange: ({ view: string, visualization?: string }) => void,
-  view: string,
-  visualization?: string
-|};
-*/
+export default class PerspectiveSelect extends React.PureComponent<Props> {
+  handleChange = (option: Option) => {
+    if (option.type === 'view') {
+      this.props.onChange({ view: option.value });
+    } else if (option.type === 'visualization') {
+      this.props.onChange({ view: 'visualizations', visualization: option.value });
+    }
+  };
 
-export default class PerspectiveSelect extends React.PureComponent {
-  /*:: options: Array<Option>; */
-  /*:: props: Props; */
-
-  constructor(props /*: Props */) {
-    super(props);
-    this.options = [
+  render() {
+    const { view, visualization } = this.props;
+    const perspective = view === 'visualizations' ? visualization : view;
+    const options = [
       ...VIEWS.map(opt => ({
         type: 'view',
         value: opt,
@@ -55,19 +54,6 @@ export default class PerspectiveSelect extends React.PureComponent {
         label: translate('projects.visualization', opt)
       }))
     ];
-  }
-
-  handleChange = (option /*: Option */) => {
-    if (option.type === 'view') {
-      this.props.onChange({ view: option.value });
-    } else if (option.type === 'visualization') {
-      this.props.onChange({ view: 'visualizations', visualization: option.value });
-    }
-  };
-
-  render() {
-    const { view, visualization } = this.props;
-    const perspective = view === 'visualizations' ? visualization : view;
     return (
       <div className={this.props.className}>
         <label>{translate('projects.perspective')}:</label>
@@ -76,7 +62,7 @@ export default class PerspectiveSelect extends React.PureComponent {
           clearable={false}
           onChange={this.handleChange}
           optionComponent={PerspectiveSelectOption}
-          options={this.options}
+          options={options}
           searchable={false}
           value={perspective}
         />

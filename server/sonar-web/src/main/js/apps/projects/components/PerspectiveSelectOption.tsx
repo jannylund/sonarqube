@@ -21,7 +21,7 @@ import * as React from 'react';
 import BubblesIcon from '../../../components/icons-components/BubblesIcon';
 import ListIcon from '../../../components/icons-components/ListIcon';
 
-interface Option {
+export interface Option {
   label: string;
   type: string;
   value: string;
