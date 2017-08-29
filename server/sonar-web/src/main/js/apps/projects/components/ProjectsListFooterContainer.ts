@@ -20,9 +20,9 @@
 import { connect } from 'react-redux';
 import { getProjects, getProjectsAppState } from '../../../store/rootReducer';
 import { fetchMoreProjects } from '../store/actions';
-import ProjectsListFooter from './ProjectsListFooter';
+import ListFooter from '../../../components/controls/ListFooter';
 
-const mapStateToProps = state => {
+const mapStateToProps = (state: any) => {
   const projects = getProjects(state);
   const appState = getProjectsAppState(state);
   return {
@@ -32,9 +32,9 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => ({
+const mapDispatchToProps = (dispatch: any, ownProps: any) => ({
   loadMore: () =>
     dispatch(fetchMoreProjects(ownProps.query, ownProps.isFavorite, ownProps.organization))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProjectsListFooter);
+export default connect(mapStateToProps, mapDispatchToProps)(ListFooter);
