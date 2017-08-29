@@ -30,8 +30,8 @@ import static com.google.common.collect.ImmutableList.copyOf;
 import static org.sonar.server.health.Health.newHealthCheckBuilder;
 
 /**
- * Implementation of {@link HealthChecker} that executes implementations of {@link NodeHealthCheck} in the container
- * and aggregates their results.
+ * Implementation of {@link HealthChecker} based on {@link NodeHealthCheck} and {@link ClusterHealthCheck} instances
+ * available in the container.
  */
 public class HealthCheckerImpl implements HealthChecker {
   private final Configuration configuration;
