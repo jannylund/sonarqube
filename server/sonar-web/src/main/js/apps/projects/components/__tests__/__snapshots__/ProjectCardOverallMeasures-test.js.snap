@@ -186,8 +186,6 @@ exports[`should render correctly with all data 1`] = `
           className="spacer-right"
         >
           <DuplicationsRating
-            muted={false}
-            small={false}
             value={9.8}
           />
         </span>
