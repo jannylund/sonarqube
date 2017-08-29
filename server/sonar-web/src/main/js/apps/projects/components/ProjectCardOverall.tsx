@@ -17,9 +17,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
-import classNames from 'classnames';
+import * as React from 'react';
+import * as classNames from 'classnames';
 import { Link } from 'react-router';
 import DateTimeFormatter from '../../../components/intl/DateTimeFormatter';
 import ProjectCardQualityGate from './ProjectCardQualityGate';
@@ -30,36 +29,36 @@ import TagsList from '../../../components/tags/TagsList';
 import PrivateBadge from '../../../components/common/PrivateBadge';
 import { translate, translateWithParameters } from '../../../helpers/l10n';
 
-/*::
-type Props = {
-  measures: { [string]: string },
-  organization?: { key: string },
+interface Props {
+  measures?: { [key: string]: string };
+  organization?: { key: string };
   project?: {
-    analysisDate?: string,
-    key: string,
-    name: string,
-    tags: Array<string>,
-    isFavorite?: boolean,
-    organization?: string,
-    visibility?: boolean
-  }
-};
-*/
+    analysisDate?: string;
+    key: string;
+    name: string;
+    tags: Array<string>;
+    isFavorite?: boolean;
+    organization?: string;
+    visibility?: string;
+  };
+}
 
-export default function ProjectCardOverall({ measures, organization, project } /*: Props */) {
-  if (project == null) {
+export default function ProjectCardOverall({ measures, organization, project }: Props) {
+  if (project == undefined) {
     return null;
   }
 
-  const isProjectAnalyzed = project.analysisDate != null;
+  const isProjectAnalyzed = project.analysisDate != undefined;
   const isPrivate = project.visibility === 'private';
   const hasTags = project.tags.length > 0;
-  const showOrganization = organization == null && project.organization != null;
+  const showOrganization = organization == undefined && project.organization != undefined;
 
   // check for particular measures because only some measures can be loaded
   // if coming from visualizations tab
   const areProjectMeasuresLoaded =
-    measures != null && measures['reliability_rating'] != null && measures['sqale_rating'] != null;
+    measures != undefined &&
+    measures['reliability_rating'] != undefined &&
+    measures['sqale_rating'] != undefined;
 
   const displayQualityGate = areProjectMeasuresLoaded && isProjectAnalyzed;
   const className = classNames('boxed-group', 'project-card', {
@@ -69,7 +68,7 @@ export default function ProjectCardOverall({ measures, organization, project } /
   return (
     <div data-key={project.key} className={className}>
       <div className="boxed-group-header clearfix">
-        {project.isFavorite != null && (
+        {project.isFavorite != undefined && (
           <FavoriteContainer className="spacer-right" componentKey={project.key} />
         )}
         <h2 className="project-card-name">
@@ -80,12 +79,12 @@ export default function ProjectCardOverall({ measures, organization, project } /
           )}
           <Link to={{ pathname: '/dashboard', query: { id: project.key } }}>{project.name}</Link>
         </h2>
-        {displayQualityGate && <ProjectCardQualityGate status={measures['alert_status']} />}
+        {displayQualityGate && <ProjectCardQualityGate status={measures!['alert_status']} />}
         <div className="pull-right text-right">
           {isPrivate && <PrivateBadge className="spacer-left" tooltipPlacement="left" />}
           {hasTags && <TagsList tags={project.tags} customClass="spacer-left" />}
         </div>
-        {isProjectAnalyzed && (
+        {project.analysisDate && (
           <div className="project-card-dates note text-right">
             <DateTimeFormatter date={project.analysisDate}>
               {formattedDate => (

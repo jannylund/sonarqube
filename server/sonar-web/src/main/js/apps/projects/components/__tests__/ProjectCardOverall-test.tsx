@@ -17,13 +17,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 import ProjectCardOverall from '../ProjectCardOverall';
 
 const PROJECT = {
   analysisDate: '2017-01-01',
-  leakPeriodDate: '2016-12-01',
   key: 'foo',
   name: 'Foo',
   tags: []
@@ -32,7 +31,7 @@ const MEASURES = {
   alert_status: 'OK',
   reliability_rating: '1.0',
   sqale_rating: '1.0',
-  new_bugs: 12
+  new_bugs: '12'
 };
 
 it('should display analysis date (and not leak period) when defined', () => {
@@ -49,14 +48,13 @@ it('should display analysis date (and not leak period) when defined', () => {
 });
 
 it('should display loading', () => {
-  const measures = { ...MEASURES, sqale_rating: undefined };
   expect(
     shallow(<ProjectCardOverall project={PROJECT} />)
       .find('.boxed-group')
       .hasClass('boxed-group-loading')
   ).toBeTruthy();
   expect(
-    shallow(<ProjectCardOverall measures={measures} project={PROJECT} />)
+    shallow(<ProjectCardOverall measures={{ sqale_rating: '1.0' }} project={PROJECT} />)
       .find('.boxed-group')
       .hasClass('boxed-group-loading')
   ).toBeTruthy();
@@ -83,7 +81,7 @@ it('should display tags', () => {
 it('should private badge', () => {
   const project = { ...PROJECT, visibility: 'private' };
   expect(
-    shallow(<ProjectCardOverall type="overall" project={project} />)
+    shallow(<ProjectCardOverall project={project} />)
       .find('PrivateBadge')
       .exists()
   ).toBeTruthy();
