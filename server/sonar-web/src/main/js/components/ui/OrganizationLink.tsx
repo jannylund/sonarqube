@@ -17,18 +17,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
+import * as React from 'react';
 import { Link } from 'react-router';
 
-export default function OrganizationLink(
-  props /*: {
-  children?: React.Element<*>,
-  organization: {
-    key: string
-  }
-} */
-) {
+interface Props {
+  children?: React.ReactNode;
+  organization: { key: string };
+  [x: string]: any;
+}
+
+export default function OrganizationLink(props: Props) {
   const { children, organization, ...other } = props;
 
   return (
