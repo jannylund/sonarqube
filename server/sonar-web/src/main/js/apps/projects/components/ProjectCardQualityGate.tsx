@@ -17,14 +17,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-//@flow
-import React from 'react';
+import * as React from 'react';
 import Level from '../../../components/ui/Level';
 import Tooltip from '../../../components/controls/Tooltip';
 import { formatMeasure } from '../../../helpers/measures';
 import { translateWithParameters } from '../../../helpers/l10n';
 
-export default function ProjectCardQualityGate({ status } /*: { status?: string } */) {
+interface Props {
+  status?: string;
+}
+
+export default function ProjectCardQualityGate({ status }: Props) {
   if (!status) {
     return null;
   }
