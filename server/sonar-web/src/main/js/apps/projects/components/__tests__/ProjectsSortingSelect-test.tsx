@@ -17,13 +17,21 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 import ProjectsSortingSelect from '../ProjectsSortingSelect';
+import { click } from '../../../../helpers/testUtils';
 
 it('should render correctly for overall view', () => {
   expect(
-    shallow(<ProjectsSortingSelect selectedSort="name" view="overall" defaultOption="name" />)
+    shallow(
+      <ProjectsSortingSelect
+        defaultOption="name"
+        onChange={jest.fn()}
+        selectedSort="name"
+        view="overall"
+      />
+    )
   ).toMatchSnapshot();
 });
 
@@ -31,9 +39,10 @@ it('should render correctly for leak view', () => {
   expect(
     shallow(
       <ProjectsSortingSelect
+        defaultOption="analysis_date"
+        onChange={jest.fn()}
         selectedSort="new_coverage"
         view="leak"
-        defaultOption="analysis_date"
       />
     )
   ).toMatchSnapshot();
@@ -42,7 +51,40 @@ it('should render correctly for leak view', () => {
 it('should handle the descending sort direction', () => {
   expect(
     shallow(
-      <ProjectsSortingSelect selectedSort="-vulnerability" view="overall" defaultOption="name" />
+      <ProjectsSortingSelect
+        defaultOption="name"
+        onChange={jest.fn()}
+        selectedSort="-vulnerability"
+        view="overall"
+      />
     )
   ).toMatchSnapshot();
+});
+
+it('changes sorting', () => {
+  const onChange = jest.fn();
+  const instance = shallow(
+    <ProjectsSortingSelect
+      defaultOption="name"
+      onChange={onChange}
+      selectedSort="-vulnerabilities"
+      view="overall"
+    />
+  ).instance() as ProjectsSortingSelect;
+  instance.handleSortChange({ label: 'size', value: 'size' });
+  expect(onChange).toBeCalledWith('size', true);
+});
+
+it('reverses sorting', () => {
+  const onChange = jest.fn();
+  const wrapper = shallow(
+    <ProjectsSortingSelect
+      defaultOption="name"
+      onChange={onChange}
+      selectedSort="-size"
+      view="overall"
+    />
+  );
+  click(wrapper.find('a'));
+  expect(onChange).toBeCalledWith('size', false);
 });

@@ -17,75 +17,51 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
+import * as React from 'react';
 import { sortBy } from 'lodash';
-import Select from 'react-select';
-import ProjectsSortingSelectOption from './ProjectsSortingSelectOption';
+import * as Select from 'react-select';
+import ProjectsSortingSelectOption, { Option } from './ProjectsSortingSelectOption';
 import SortAscIcon from '../../../components/icons-components/SortAscIcon';
 import SortDescIcon from '../../../components/icons-components/SortDescIcon';
 import Tooltip from '../../../components/controls/Tooltip';
 import { translate } from '../../../helpers/l10n';
 import { SORTING_METRICS, SORTING_LEAK_METRICS, parseSorting } from '../utils';
 
-/*::
-export type Option = { label: string, value: string, class?: string, short?: string };
-*/
+interface Props {
+  className?: string;
+  defaultOption: string;
+  onChange: (sort: string, desc: boolean) => void;
+  selectedSort: string;
+  view: string;
+}
 
-/*::
-type Props = {
-  className?: string,
-  onChange: (sort: string, desc: boolean) => void,
-  selectedSort: string,
-  view: string,
-  defaultOption: string
-};
-*/
-
-/*::
-type State = {
-  sortValue: string,
-  sortDesc: boolean
-};
-*/
-
-export default class ProjectsSortingSelect extends React.PureComponent {
-  /*:: props: Props; */
-  /*:: state: State; */
-
-  constructor(props /*: Props */) {
-    super(props);
-    this.state = parseSorting(props.selectedSort);
-  }
-
-  componentDidUpdate(prevProps /*: Props */) {
-    if (prevProps.selectedSort !== this.props.selectedSort) {
-      this.setState(parseSorting(this.props.selectedSort));
-    }
-  }
+export default class ProjectsSortingSelect extends React.PureComponent<Props> {
+  getSorting = () => parseSorting(this.props.selectedSort);
 
   getOptions = () => {
     const sortMetrics = this.props.view === 'leak' ? SORTING_LEAK_METRICS : SORTING_METRICS;
-    return sortBy(sortMetrics, opt => (opt.value === this.props.defaultOption ? 0 : 1)).map((
-      opt /*: { value: string, class?: string } */
-    ) => ({
-      value: opt.value,
-      label: translate('projects.sorting', opt.value),
-      class: opt.class
+    return sortBy(
+      sortMetrics,
+      option => (option.value === this.props.defaultOption ? 0 : 1)
+    ).map(option => ({
+      value: option.value,
+      label: translate('projects.sorting', option.value),
+      class: option.class
     }));
   };
 
-  handleDescToggle = (evt /*: Event & { currentTarget: HTMLElement } */) => {
-    evt.preventDefault();
-    evt.currentTarget.blur();
-    this.props.onChange(this.state.sortValue, !this.state.sortDesc);
+  handleDescToggle = (event: React.SyntheticEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    event.currentTarget.blur();
+    const sorting = this.getSorting();
+    this.props.onChange(sorting.sortValue, !sorting.sortDesc);
   };
 
-  handleSortChange = (option /*: Option */) =>
-    this.props.onChange(option.value, this.state.sortDesc);
+  handleSortChange = (option: Option) =>
+    this.props.onChange(option.value, this.getSorting().sortDesc);
 
   render() {
-    const { sortDesc } = this.state;
+    const { sortDesc, sortValue } = this.getSorting();
 
     return (
       <div className={this.props.className}>
@@ -97,7 +73,7 @@ export default class ProjectsSortingSelect extends React.PureComponent {
           optionComponent={ProjectsSortingSelectOption}
           options={this.getOptions()}
           searchable={false}
-          value={this.state.sortValue}
+          value={sortValue}
         />
         <Tooltip
           overlay={

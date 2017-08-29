@@ -19,7 +19,12 @@
  */
 import { translate } from '../../helpers/l10n';
 
-export const SORTING_METRICS = [
+interface SortingOption {
+  class?: string;
+  value: string;
+}
+
+export const SORTING_METRICS: SortingOption[] = [
   { value: 'name' },
   { value: 'analysis_date' },
   { value: 'reliability' },
@@ -30,7 +35,7 @@ export const SORTING_METRICS = [
   { value: 'size' }
 ];
 
-export const SORTING_LEAK_METRICS = [
+export const SORTING_LEAK_METRICS: SortingOption[] = [
   { value: 'name' },
   { value: 'analysis_date' },
   { value: 'new_reliability', class: 'projects-leak-sorting-option' },
