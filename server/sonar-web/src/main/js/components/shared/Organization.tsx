@@ -17,62 +17,48 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
+import * as React from 'react';
 import { connect } from 'react-redux';
 import { getOrganizationByKey, areThereCustomOrganizations } from '../../store/rootReducer';
 import OrganizationLink from '../ui/OrganizationLink';
 
-/*::
-type OwnProps = {
-  organizationKey: string
-};
-*/
-
-/*::
-type Props = {
-  link?: boolean,
-  linkClassName?: string,
-  organizationKey: string,
-  organization: { key: string, name: string } | null,
-  shouldBeDisplayed: boolean
-};
-*/
-
-class Organization extends React.PureComponent {
-  /*:: props: Props; */
-
-  static defaultProps = {
-    link: true
-  };
-
-  render() {
-    const { organization, shouldBeDisplayed } = this.props;
-
-    if (!shouldBeDisplayed || !organization) {
-      return null;
-    }
-
-    return (
-      <span>
-        {this.props.link ? (
-          <OrganizationLink className={this.props.linkClassName} organization={organization}>
-            {organization.name}
-          </OrganizationLink>
-        ) : (
-          organization.name
-        )}
-        <span className="slash-separator" />
-      </span>
-    );
-  }
+interface OwnProps {
+  organizationKey: string;
 }
 
-const mapStateToProps = (state, ownProps /*: OwnProps */) => ({
+interface Props {
+  link?: boolean;
+  linkClassName?: string;
+  organization: { key: string; name: string } | null;
+  shouldBeDisplayed: boolean;
+}
+
+function Organization(props: Props) {
+  const { link = true, organization, shouldBeDisplayed } = props;
+
+  if (!shouldBeDisplayed || !organization) {
+    return null;
+  }
+
+  return (
+    <span>
+      {link ? (
+        <OrganizationLink className={props.linkClassName} organization={organization}>
+          {organization.name}
+        </OrganizationLink>
+      ) : (
+        organization.name
+      )}
+      <span className="slash-separator" />
+    </span>
+  );
+}
+
+const mapStateToProps = (state: any, ownProps: OwnProps) => ({
   organization: getOrganizationByKey(state, ownProps.organizationKey),
   shouldBeDisplayed: areThereCustomOrganizations(state)
 });
 
-export default connect(mapStateToProps)(Organization);
+export default connect<any, any, any>(mapStateToProps)(Organization);
 
 export const UnconnectedOrganization = Organization;
