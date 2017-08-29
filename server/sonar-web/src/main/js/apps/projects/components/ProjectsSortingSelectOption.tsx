@@ -17,36 +17,37 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-//@flow
-import React from 'react';
-import classNames from 'classnames';
-/*:: import type { Option } from './ProjectsSortingSelect'; */
+import * as React from 'react';
+import * as classNames from 'classnames';
 
-/*::
-type Props = {
-  option: Option,
-  children?: Element | Text,
-  className?: string,
-  isFocused?: boolean,
-  onFocus: (Option, MouseEvent) => void,
-  onSelect: (Option, MouseEvent) => void
-};
-*/
+export interface Option {
+  label: string;
+  value: string;
+  class?: string;
+  short?: string;
+}
 
-export default class ProjectsSortingSelectOption extends React.PureComponent {
-  /*:: props: Props; */
+interface Props {
+  option: Option;
+  children?: React.ReactNode;
+  className?: string;
+  isFocused?: boolean;
+  onFocus: (option: Option, event: React.SyntheticEvent<HTMLElement>) => void;
+  onSelect: (option: Option, event: React.SyntheticEvent<HTMLElement>) => void;
+}
 
-  handleMouseDown = (event /*: MouseEvent */) => {
+export default class ProjectsSortingSelectOption extends React.PureComponent<Props> {
+  handleMouseDown = (event: React.SyntheticEvent<HTMLElement>) => {
     event.preventDefault();
     event.stopPropagation();
     this.props.onSelect(this.props.option, event);
   };
 
-  handleMouseEnter = (event /*: MouseEvent */) => {
+  handleMouseEnter = (event: React.SyntheticEvent<HTMLElement>) => {
     this.props.onFocus(this.props.option, event);
   };
 
-  handleMouseMove = (event /*: MouseEvent */) => {
+  handleMouseMove = (event: React.SyntheticEvent<HTMLElement>) => {
     if (this.props.isFocused) {
       return;
     }
