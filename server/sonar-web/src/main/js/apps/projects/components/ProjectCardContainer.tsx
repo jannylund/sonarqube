@@ -17,20 +17,38 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
+import * as React from 'react';
 import { connect } from 'react-redux';
 import ProjectCardLeak from './ProjectCardLeak';
 import ProjectCardOverall from './ProjectCardOverall';
 import { getComponent, getComponentMeasures } from '../../../store/rootReducer';
 
-function ProjectCard(props /*: { type?: string } */) {
+interface Props {
+  measures?: { [key: string]: string };
+  organization?: { key: string };
+  project?: {
+    analysisDate?: string;
+    key: string;
+    leakPeriodDate?: string;
+    name: string;
+    tags: Array<string>;
+    isFavorite?: boolean;
+    organization?: string;
+    visibility?: string;
+  };
+  type?: string;
+}
+
+function ProjectCard(props: Props) {
   if (props.type === 'leak') {
     return <ProjectCardLeak {...props} />;
   }
   return <ProjectCardOverall {...props} />;
 }
 
-export default connect((state, ownProps) => ({
+const mapStateToProps = (state: any, ownProps: any) => ({
   project: getComponent(state, ownProps.projectKey),
   measures: getComponentMeasures(state, ownProps.projectKey)
-}))(ProjectCard);
+});
+
+export default connect(mapStateToProps)(ProjectCard);
