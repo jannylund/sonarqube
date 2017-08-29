@@ -21,8 +21,8 @@ import { connect } from 'react-redux';
 import FavoriteFilter from './FavoriteFilter';
 import { getCurrentUser } from '../../../store/rootReducer';
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state: any) => ({
   user: getCurrentUser(state)
 });
 
-export default connect(mapStateToProps)(FavoriteFilter);
+export default connect(mapStateToProps)(FavoriteFilter as any);
