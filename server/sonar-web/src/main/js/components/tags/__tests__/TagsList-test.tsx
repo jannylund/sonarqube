@@ -17,8 +17,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import * as React from 'react';
 import { shallow } from 'enzyme';
-import React from 'react';
 import TagsList from '../TagsList';
 
 const tags = ['foo', 'bar'];
@@ -30,14 +30,10 @@ it('should render with a list of tag', () => {
   expect(taglist.find('span.note').hasClass('text-ellipsis')).toBe(true);
 });
 
-it('should FAIL to render without tags', () => {
-  expect(() => shallow(<TagsList />)).toThrow();
-});
-
 it('should correctly handle a lot of tags', () => {
   const lotOfTags = [];
   for (let i = 0; i < 20; i++) {
-    lotOfTags.push(tags);
+    lotOfTags.push(String(tags));
   }
   const taglist = shallow(<TagsList tags={lotOfTags} />);
   expect(taglist.text()).toBe(lotOfTags.join(', '));
