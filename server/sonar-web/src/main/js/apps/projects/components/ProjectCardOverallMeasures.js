@@ -19,7 +19,7 @@
  */
 //@flow
 import React from 'react';
-import ProjectCardLanguages from './ProjectCardLanguages';
+import ProjectCardLanguagesContainer from './ProjectCardLanguagesContainer';
 import Measure from '../../../components/measure/Measure';
 import Rating from '../../../components/ui/Rating';
 import CoverageRating from '../../../components/ui/CoverageRating';
@@ -128,7 +128,9 @@ export default function ProjectCardOverallMeasures({ measures } /*: Props */) {
               />
             </div>
             <div className="project-card-measure-label">
-              <ProjectCardLanguages distribution={measures['ncloc_language_distribution']} />
+              <ProjectCardLanguagesContainer
+                distribution={measures['ncloc_language_distribution']}
+              />
             </div>
           </div>
         </div>
