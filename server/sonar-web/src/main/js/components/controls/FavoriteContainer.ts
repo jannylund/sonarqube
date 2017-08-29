@@ -25,7 +25,7 @@ import * as api from '../../api/favorites';
 import { addGlobalErrorMessage } from '../../store/globalMessages/duck';
 import { parseError } from '../../apps/code/utils';
 
-const addFavorite = componentKey => dispatch => {
+const addFavorite = (componentKey: string) => (dispatch: Function) => {
   // optimistic update
   dispatch(actionCreators.addFavorite(componentKey));
   api.addFavorite(componentKey).catch(error => {
@@ -34,7 +34,7 @@ const addFavorite = componentKey => dispatch => {
   });
 };
 
-const removeFavorite = componentKey => dispatch => {
+const removeFavorite = (componentKey: string) => (dispatch: Function) => {
   // optimistic update
   dispatch(actionCreators.removeFavorite(componentKey));
   api.removeFavorite(componentKey).catch(error => {
@@ -43,11 +43,11 @@ const removeFavorite = componentKey => dispatch => {
   });
 };
 
-const mapStateToProps = (state, ownProps) => ({
+const mapStateToProps = (state: any, ownProps: any) => ({
   favorite: isFavorite(state, ownProps.componentKey)
 });
 
-const mapDispatchToProps = (dispatch, ownProps) => ({
+const mapDispatchToProps = (dispatch: Function, ownProps: any) => ({
   addFavorite: () => dispatch(addFavorite(ownProps.componentKey)),
   removeFavorite: () => dispatch(removeFavorite(ownProps.componentKey))
 });
