@@ -1,7 +1,7 @@
 /*
  * SonarQube
- * Copyright (C) 2009-2017 SonarSource SA
- * mailto:info AT sonarsource DOT com
+ * Copyright (C) 2009-2016 SonarSource SA
+ * mailto:contact AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,20 +17,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
-import { Link } from 'react-router';
-import { translate } from '../../../helpers/l10n';
+import * as React from 'react';
+import { shallow } from 'enzyme';
+import NoFavoriteProjects from '../NoFavoriteProjects';
 
-export default function NoFavoriteProjects() {
-  return (
-    <div className="projects-empty-list">
-      <h3>{translate('projects.no_favorite_projects')}</h3>
-      <p className="big-spacer-top">{translate('projects.no_favorite_projects.engagement')}</p>
-      <p className="big-spacer-top">
-        <Link to="/projects/all" className="button">
-          {translate('projects.explore_projects')}
-        </Link>
-      </p>
-    </div>
-  );
-}
+it('renders', () => {
+  expect(shallow(<NoFavoriteProjects />)).toMatchSnapshot();
+});
