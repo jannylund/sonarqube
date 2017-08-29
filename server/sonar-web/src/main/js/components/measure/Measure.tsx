@@ -17,26 +17,29 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
+import * as React from 'react';
 import Rating from '../ui/Rating';
 import Level from '../ui/Level';
 import Tooltips from '../controls/Tooltip';
 import { formatMeasure, isDiffMetric } from '../../helpers/measures';
-import { formatLeak, getRatingTooltip } from './utils';
-/*:: import type { MeasureEnhanced } from './types'; */
+import { formatLeak, getRatingTooltip, MeasureEnhanced } from './utils';
 
-/*:: type Props = {
-  className?: string,
-  decimals?: ?number,
-  measure: MeasureEnhanced
-}; */
+interface Props {
+  className?: string;
+  decimals?: number | null;
+  measure: MeasureEnhanced;
+}
 
-export default function Measure({ className, decimals, measure } /*: Props */) {
+export default function Measure({ className, decimals, measure }: Props) {
   const metric = measure.metric;
+  const value = isDiffMetric(metric.key) ? measure.leak : measure.value;
+
+  if (value == undefined) {
+    return null;
+  }
 
   if (metric.type === 'LEVEL') {
-    return <Level className={className} level={measure.value} />;
+    return <Level className={className} level={value} />;
   }
 
   if (metric.type !== 'RATING') {
@@ -46,8 +49,7 @@ export default function Measure({ className, decimals, measure } /*: Props */) {
     return <span className={className}>{formattedValue != null ? formattedValue : '–'}</span>;
   }
 
-  const value = isDiffMetric(metric.key) ? measure.leak : measure.value;
-  const tooltip = getRatingTooltip(metric.key, value);
+  const tooltip = getRatingTooltip(metric.key, Number(value));
   const rating = <Rating value={value} />;
   if (tooltip) {
     return (

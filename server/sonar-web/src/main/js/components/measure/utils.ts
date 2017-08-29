@@ -17,22 +17,34 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
 import {
   formatMeasure,
   formatMeasureVariation,
   getRatingTooltip as nextGetRatingTooltip,
   isDiffMetric
 } from '../../helpers/measures';
-/*:: import type { Measure, MeasureEnhanced } from './types'; */
-/*:: import type { Metric } from '../../store/metrics/actions'; */
+import { Metric } from '../../app/types';
 
 const KNOWN_RATINGS = ['sqale_rating', 'reliability_rating', 'security_rating'];
 
+export interface MeasureIntern {
+  value?: string;
+  periods?: Array<{ index: number; value: string }>;
+}
+
+export interface Measure extends MeasureIntern {
+  metric: string;
+}
+
+export interface MeasureEnhanced extends MeasureIntern {
+  metric: Metric;
+  leak?: string | undefined | undefined;
+}
+
 export function enhanceMeasure(
-  measure /*: Measure */,
-  metrics /*: { [string]: Metric } */
-) /*: MeasureEnhanced */ {
+  measure: Measure,
+  metrics: { [key: string]: Metric }
+): MeasureEnhanced {
   return {
     value: measure.value,
     periods: measure.periods,
@@ -41,7 +53,7 @@ export function enhanceMeasure(
   };
 }
 
-export function formatLeak(value /*: ?string*/, metric /*: Metric*/, options /*: Object*/) {
+export function formatLeak(value: string | undefined, metric: Metric, options: any): string {
   if (isDiffMetric(metric.key)) {
     return formatMeasure(value, metric.type, options);
   } else {
@@ -49,18 +61,18 @@ export function formatLeak(value /*: ?string*/, metric /*: Metric*/, options /*:
   }
 }
 
-export function getLeakValue(measure /*: ?Measure*/) /*: ?string*/ {
+export function getLeakValue(measure: Measure | undefined): string | undefined {
   if (!measure || !measure.periods) {
-    return null;
+    return undefined;
   }
   const period = measure.periods.find(period => period.index === 1);
-  return period ? period.value : null;
+  return period && period.value;
 }
 
-export function getRatingTooltip(metricKey /*: string */, value /*: ?string*/) {
+export function getRatingTooltip(metricKey: string, value: number): string | undefined {
   const finalMetricKey = isDiffMetric(metricKey) ? metricKey.substr(4) : metricKey;
   if (KNOWN_RATINGS.includes(finalMetricKey)) {
     return nextGetRatingTooltip(finalMetricKey, value);
   }
-  return null;
+  return undefined;
 }
