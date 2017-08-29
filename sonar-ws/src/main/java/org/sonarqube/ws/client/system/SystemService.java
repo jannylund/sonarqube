@@ -30,6 +30,10 @@ public class SystemService extends BaseService {
     super(wsConnector, "api/system");
   }
 
+  public WsSystem.ClusterHealthResponse clusterHealth() {
+    return call(new GetRequest(path("cluster_health")), WsSystem.ClusterHealthResponse.parser());
+  }
+
   public WsSystem.HealthResponse health() {
     return call(new GetRequest(path("health")), WsSystem.HealthResponse.parser());
   }

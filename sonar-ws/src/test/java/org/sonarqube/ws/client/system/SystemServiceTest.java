@@ -36,6 +36,16 @@ public class SystemServiceTest {
   private SystemService underTest = serviceTester.getInstanceUnderTest();
 
   @Test
+  public void test_cluster_health() throws Exception {
+    underTest.clusterHealth();
+
+    GetRequest getRequest = serviceTester.getGetRequest();
+    serviceTester.assertThat(getRequest)
+      .hasPath("cluster_health")
+      .andNoOtherParam();
+  }
+
+  @Test
   public void test_health() throws Exception {
     underTest.health();
 
