@@ -17,7 +17,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
 import { translate } from '../../helpers/l10n';
 
 export const SORTING_METRICS = [
@@ -70,11 +69,11 @@ export const VISUALIZATIONS = [
   'duplications'
 ];
 
-export const localizeSorting = (sort /*: ?string */) => {
+export function localizeSorting(sort?: string): string {
   return translate('projects.sort', sort || 'name');
-};
+}
 
-export function parseSorting(sort /*: string */) /*: { sortValue: string, sortDesc: boolean } */ {
+export function parseSorting(sort: string): { sortValue: string; sortDesc: boolean } {
   const desc = sort[0] === '-';
   return { sortValue: desc ? sort.substr(1) : sort, sortDesc: desc };
 }
