@@ -17,21 +17,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import * as React from 'react';
+import * as classNames from 'classnames';
 import FavoriteIcon from '../icons-components/FavoriteIcon';
 
-export default class FavoriteBaseStateless extends React.PureComponent {
-  static propTypes = {
-    favorite: PropTypes.bool.isRequired,
-    addFavorite: PropTypes.func.isRequired,
-    removeFavorite: PropTypes.func.isRequired,
-    className: PropTypes.string
-  };
+interface Props {
+  addFavorite: () => void;
+  className?: string;
+  favorite: boolean;
+  removeFavorite: () => void;
+}
 
-  toggleFavorite = e => {
-    e.preventDefault();
+export default class FavoriteBaseStateless extends React.PureComponent<Props> {
+  toggleFavorite = (event: React.SyntheticEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
     if (this.props.favorite) {
       this.props.removeFavorite();
     } else {
