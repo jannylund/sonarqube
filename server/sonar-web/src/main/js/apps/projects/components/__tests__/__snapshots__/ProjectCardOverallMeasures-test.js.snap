@@ -147,8 +147,6 @@ exports[`should render correctly with all data 1`] = `
           className="spacer-right"
         >
           <CoverageRating
-            muted={false}
-            size="normal"
             value="88.3"
           />
         </span>
