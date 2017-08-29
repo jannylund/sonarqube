@@ -17,8 +17,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-//@flow
-import React from 'react';
+import * as React from 'react';
 import Measure from '../../../components/measure/Measure';
 import BugIcon from '../../../components/icons-components/BugIcon';
 import CodeSmellIcon from '../../../components/icons-components/CodeSmellIcon';
@@ -26,14 +25,12 @@ import Rating from '../../../components/ui/Rating';
 import VulnerabilityIcon from '../../../components/icons-components/VulnerabilityIcon';
 import { translate } from '../../../helpers/l10n';
 
-/*::
-type Props = {
-  measures?: { [string]: string }
-};
-*/
+interface Props {
+  measures?: { [key: string]: string };
+}
 
-export default function ProjectCardLeakMeasures({ measures } /*: Props */) {
-  if (measures == null) {
+export default function ProjectCardLeakMeasures({ measures }: Props) {
+  if (measures == undefined) {
     return null;
   }
 

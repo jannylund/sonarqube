@@ -17,38 +17,37 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 import ProjectCardLeakMeasures from '../ProjectCardLeakMeasures';
 
-const measures = {
-  alert_status: 'ERROR',
-  new_reliability_rating: '1.0',
-  new_bugs: '8',
-  new_security_rating: '2.0',
-  new_vulnerabilities: '2',
-  new_maintainability_rating: '1.0',
-  new_code_smells: '0',
-  new_coverage: '26.55',
-  new_duplicated_lines_density: '0.55',
-  new_lines: '87'
-};
-
 it('should render correctly with all data', () => {
+  const measures = {
+    alert_status: 'ERROR',
+    new_reliability_rating: '1.0',
+    new_bugs: '8',
+    new_security_rating: '2.0',
+    new_vulnerabilities: '2',
+    new_maintainability_rating: '1.0',
+    new_code_smells: '0',
+    new_coverage: '26.55',
+    new_duplicated_lines_density: '0.55',
+    new_lines: '87'
+  };
   const wrapper = shallow(<ProjectCardLeakMeasures measures={measures} />);
   expect(wrapper).toMatchSnapshot();
 });
 
 it('should render no data style new coverage, new duplications and new lines', () => {
-  const wrapper = shallow(
-    <ProjectCardLeakMeasures
-      measures={{
-        ...measures,
-        new_coverage: undefined,
-        new_duplicated_lines_density: undefined,
-        new_lines: undefined
-      }}
-    />
-  );
+  const measures = {
+    alert_status: 'ERROR',
+    new_reliability_rating: '1.0',
+    new_bugs: '8',
+    new_security_rating: '2.0',
+    new_vulnerabilities: '2',
+    new_maintainability_rating: '1.0',
+    new_code_smells: '0'
+  };
+  const wrapper = shallow(<ProjectCardLeakMeasures measures={measures} />);
   expect(wrapper).toMatchSnapshot();
 });
