@@ -225,8 +225,6 @@ exports[`should render correctly with all data 1`] = `
           className="spacer-right"
         >
           <SizeRating
-            muted={false}
-            small={false}
             value={2053}
           />
         </span>
@@ -268,8 +266,6 @@ exports[`should render ncloc correctly 1`] = `
         className="spacer-right"
       >
         <SizeRating
-          muted={false}
-          small={false}
           value={16549887}
         />
       </span>
