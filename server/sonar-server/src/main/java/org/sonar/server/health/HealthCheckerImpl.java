@@ -22,8 +22,7 @@ package org.sonar.server.health;
 import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
-import org.sonar.api.config.Configuration;
-import org.sonar.process.ProcessProperties;
+import org.sonar.server.platform.WebServer;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableList.copyOf;
@@ -34,24 +33,24 @@ import static org.sonar.server.health.Health.newHealthCheckBuilder;
  * available in the container.
  */
 public class HealthCheckerImpl implements HealthChecker {
-  private final Configuration configuration;
+  private final WebServer webServer;
   private final List<NodeHealthCheck> nodeHealthChecks;
   private final List<ClusterHealthCheck> clusterHealthChecks;
 
-  public HealthCheckerImpl(Configuration configuration) {
-    this(configuration, new NodeHealthCheck[0], new ClusterHealthCheck[0]);
+  public HealthCheckerImpl(WebServer webServer) {
+    this(webServer, new NodeHealthCheck[0], new ClusterHealthCheck[0]);
   }
 
-  public HealthCheckerImpl(Configuration configuration, NodeHealthCheck[] nodeHealthChecks) {
-    this(configuration, nodeHealthChecks, new ClusterHealthCheck[0]);
+  public HealthCheckerImpl(WebServer webServer, NodeHealthCheck[] nodeHealthChecks) {
+    this(webServer, nodeHealthChecks, new ClusterHealthCheck[0]);
   }
 
-  public HealthCheckerImpl(Configuration configuration, ClusterHealthCheck[] clusterHealthChecks) {
-    this(configuration, new NodeHealthCheck[0], clusterHealthChecks);
+  public HealthCheckerImpl(WebServer webServer, ClusterHealthCheck[] clusterHealthChecks) {
+    this(webServer, new NodeHealthCheck[0], clusterHealthChecks);
   }
 
-  public HealthCheckerImpl(Configuration configuration, NodeHealthCheck[] nodeHealthChecks, ClusterHealthCheck[] clusterHealthChecks) {
-    this.configuration = configuration;
+  public HealthCheckerImpl(WebServer webServer, NodeHealthCheck[] nodeHealthChecks, ClusterHealthCheck[] clusterHealthChecks) {
+    this.webServer = webServer;
     this.nodeHealthChecks = copyOf(nodeHealthChecks);
     this.clusterHealthChecks = copyOf(clusterHealthChecks);
   }
@@ -64,7 +63,7 @@ public class HealthCheckerImpl implements HealthChecker {
 
   @Override
   public Health checkCluster() {
-    checkState(configuration.getBoolean(ProcessProperties.CLUSTER_ENABLED).orElse(false), "Clustering is not enabled");
+    checkState(!webServer.isStandalone(), "Clustering is not enabled");
 
     return clusterHealthChecks.stream().map(ClusterHealthCheck::check)
       .reduce(Health.GREEN, HealthReducer.INSTANCE);

@@ -24,18 +24,18 @@ import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService;
 import org.sonar.server.health.Health;
 import org.sonar.server.health.HealthChecker;
-import org.sonar.server.platform.cluster.Cluster;
+import org.sonar.server.platform.WebServer;
 import org.sonar.server.ws.WsUtils;
 import org.sonarqube.ws.WsSystem;
 
 public class ClusterHealthAction implements SystemWsAction {
   private final ClusterHealthActionSupport support;
-  private final Cluster cluster;
+  private final WebServer webServer;
   private final HealthChecker healthChecker;
 
-  public ClusterHealthAction(ClusterHealthActionSupport support, Cluster cluster, HealthChecker healthChecker) {
+  public ClusterHealthAction(ClusterHealthActionSupport support, WebServer webServer, HealthChecker healthChecker) {
     this.support = support;
-    this.cluster = cluster;
+    this.webServer = webServer;
     this.healthChecker = healthChecker;
   }
 
@@ -46,7 +46,7 @@ public class ClusterHealthAction implements SystemWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    if (!cluster.isEnabled()) {
+    if (webServer.isStandalone()) {
       response.stream().setStatus(501);
       return;
     }

@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.sonar.api.server.ws.WebService;
 import org.sonar.server.health.Health;
 import org.sonar.server.health.HealthChecker;
-import org.sonar.server.platform.cluster.Cluster;
+import org.sonar.server.platform.WebServer;
 import org.sonar.server.ws.TestResponse;
 import org.sonar.server.ws.WsActionTester;
 import org.sonar.test.JsonAssert;
@@ -39,9 +39,9 @@ import static org.mockito.Mockito.when;
 
 public class ClusterHealthActionTest {
   private Random random = new Random();
-  private Cluster cluster = mock(Cluster.class);
+  private WebServer webServer = mock(WebServer.class);
   private HealthChecker healthChecker = mock(HealthChecker.class);
-  private WsActionTester underTest = new WsActionTester(new ClusterHealthAction(new ClusterHealthActionSupport(), cluster, healthChecker));
+  private WsActionTester underTest = new WsActionTester(new ClusterHealthAction(new ClusterHealthActionSupport(), webServer, healthChecker));
 
   @Test
   public void verify_definition() {
@@ -57,8 +57,8 @@ public class ClusterHealthActionTest {
   }
 
   @Test
-  public void returns_501_if_clustering_is_not_enabled() {
-    when(cluster.isEnabled()).thenReturn(false);
+  public void returns_501_if_standalone() {
+    when(webServer.isStandalone()).thenReturn(true);
 
     TestResponse response = underTest.newRequest().execute();
 
@@ -67,8 +67,8 @@ public class ClusterHealthActionTest {
   }
 
   @Test
-  public void returns_200_if_clustering_is_enabled() {
-    when(cluster.isEnabled()).thenReturn(true);
+  public void returns_200_if_clustering_enabled() {
+    when(webServer.isStandalone()).thenReturn(false);
     when(healthChecker.checkCluster()).thenReturn(Health.newHealthCheckBuilder()
       .setStatus(Health.Status.GREEN)
       .build());
@@ -85,7 +85,7 @@ public class ClusterHealthActionTest {
     Health.Builder healthBuilder = Health.newHealthCheckBuilder()
       .setStatus(randomStatus);
     Arrays.stream(causes).forEach(healthBuilder::addCause);
-    when(cluster.isEnabled()).thenReturn(true);
+    when(webServer.isStandalone()).thenReturn(false);
     when(healthChecker.checkCluster()).thenReturn(healthBuilder
       .build());
 
@@ -98,7 +98,7 @@ public class ClusterHealthActionTest {
 
   @Test
   public void verify_response_example() {
-    when(cluster.isEnabled()).thenReturn(true);
+    when(webServer.isStandalone()).thenReturn(false);
     when(healthChecker.checkCluster()).thenReturn(Health.newHealthCheckBuilder()
       .setStatus(Health.Status.RED)
       .addCause("Application node app-1 is RED")
