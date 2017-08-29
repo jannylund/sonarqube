@@ -25,4 +25,4 @@ const mapStateToProps = (state: any) => ({
   languages: getLanguages(state)
 });
 
-export default connect(mapStateToProps)(ProjectCardLanguages);
+export default connect<any, any, any>(mapStateToProps)(ProjectCardLanguages);
