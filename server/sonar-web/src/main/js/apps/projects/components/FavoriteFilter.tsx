@@ -17,26 +17,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
+import * as React from 'react';
 import { IndexLink, Link } from 'react-router';
 import { translate } from '../../../helpers/l10n';
 import { saveAll, saveFavorite } from '../../../helpers/storage';
-/*:: import type { RawQuery } from '../../../helpers/query'; */
+import { RawQuery } from '../../../helpers/query';
 
-/*::
-type Props = {
-  user: {
-    isLoggedIn?: boolean
-  },
-  organization?: { key: string },
-  query: RawQuery
-};
-*/
+interface Props {
+  user: { isLoggedIn?: boolean };
+  organization?: { key: string };
+  query: RawQuery;
+}
 
-export default class FavoriteFilter extends React.PureComponent {
-  /*:: props: Props; */
-
+export default class FavoriteFilter extends React.PureComponent<Props> {
   handleSaveFavorite = () => {
     if (!this.props.organization) {
       saveFavorite();
