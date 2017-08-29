@@ -17,31 +17,21 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 import PageHeader from '../PageHeader';
 
 it('should render correctly', () => {
-  expect(
-    shallow(<PageHeader query={{ search: 'test' }} projectsAppState={{ total: 12 }} />)
-  ).toMatchSnapshot();
+  expect(shallowRender()).toMatchSnapshot();
 });
 
 it('should render correctly while loading', () => {
-  expect(
-    shallow(
-      <PageHeader
-        query={{ search: '' }}
-        isFavorite={true}
-        projectsAppState={{ loading: true, total: 2 }}
-      />
-    )
-  ).toMatchSnapshot();
+  expect(shallowRender({ projectsAppState: { loading: true, total: 2 } })).toMatchSnapshot();
 });
 
 it('should not render projects total', () => {
   expect(
-    shallow(<PageHeader projectsAppState={{}} query={{ search: '' }} />)
+    shallowRender({ projectsAppState: {} })
       .find('#projects-total')
       .exists()
   ).toBeFalsy();
@@ -49,38 +39,47 @@ it('should not render projects total', () => {
 
 it('should render disabled sorting options for visualizations', () => {
   expect(
-    shallow(
-      <PageHeader
-        open={true}
-        projectsAppState={{}}
-        view="visualizations"
-        visualization="coverage"
-      />
-    )
+    shallowRender({
+      open: true,
+      projectsAppState: {},
+      view: 'visualizations',
+      visualization: 'coverage'
+    })
   ).toMatchSnapshot();
 });
 
 it('should render switch the default sorting option for anonymous users', () => {
   expect(
-    shallow(
-      <PageHeader
-        currentUser={{ isLoggedIn: true }}
-        open={true}
-        projectsAppState={{}}
-        view="overall"
-        visualization="risk"
-      />
-    ).find('ProjectsSortingSelect')
+    shallowRender({
+      currentUser: { isLoggedIn: true },
+      open: true,
+      projectsAppState: {},
+      visualization: 'risk'
+    }).find('ProjectsSortingSelect')
   ).toMatchSnapshot();
+
   expect(
-    shallow(
-      <PageHeader
-        currentUser={{ isLoggedIn: false }}
-        open={true}
-        projectsAppState={{}}
-        view="leak"
-        visualization="risk"
-      />
-    ).find('ProjectsSortingSelect')
+    shallowRender({
+      currentUser: { isLoggedIn: false },
+      open: true,
+      projectsAppState: {},
+      view: 'leak',
+      visualization: 'risk'
+    }).find('ProjectsSortingSelect')
   ).toMatchSnapshot();
 });
+
+function shallowRender(props?: any) {
+  return shallow(
+    <PageHeader
+      onPerspectiveChange={jest.fn()}
+      onSortChange={jest.fn()}
+      projects={[]}
+      projectsAppState={{ loading: false, total: 12 }}
+      query={{ search: 'test' }}
+      selectedSort="size"
+      view="overall"
+      {...props}
+    />
+  );
+}

@@ -6,10 +6,15 @@ exports[`should render correctly 1`] = `
 >
   <PerspectiveSelect
     className="projects-topbar-item js-projects-perspective-select"
+    onChange={[Function]}
+    view="overall"
   />
   <ProjectsSortingSelect
     className="projects-topbar-item js-projects-sorting-select"
     defaultOption="analysis_date"
+    onChange={[Function]}
+    selectedSort="size"
+    view="overall"
   />
   <withRouter(SearchFilterContainer)
     className="projects-topbar-item projects-topbar-item-search"
@@ -41,17 +46,21 @@ exports[`should render correctly while loading 1`] = `
 >
   <PerspectiveSelect
     className="projects-topbar-item js-projects-perspective-select"
+    onChange={[Function]}
+    view="overall"
   />
   <ProjectsSortingSelect
     className="projects-topbar-item js-projects-sorting-select"
     defaultOption="analysis_date"
+    onChange={[Function]}
+    selectedSort="size"
+    view="overall"
   />
   <withRouter(SearchFilterContainer)
     className="projects-topbar-item projects-topbar-item-search"
-    isFavorite={true}
     query={
       Object {
-        "search": "",
+        "search": "test",
       }
     }
   />
@@ -80,6 +89,7 @@ exports[`should render disabled sorting options for visualizations 1`] = `
 >
   <PerspectiveSelect
     className="projects-topbar-item js-projects-perspective-select"
+    onChange={[Function]}
     view="visualizations"
     visualization="coverage"
   />
@@ -93,12 +103,19 @@ exports[`should render disabled sorting options for visualizations 1`] = `
       <ProjectsSortingSelect
         className="js-projects-sorting-select"
         defaultOption="analysis_date"
+        onChange={[Function]}
+        selectedSort="size"
         view="visualizations"
       />
     </div>
   </Tooltip>
   <withRouter(SearchFilterContainer)
     className="projects-topbar-item projects-topbar-item-search"
+    query={
+      Object {
+        "search": "test",
+      }
+    }
   />
   <div
     className="projects-topbar-item is-last"
@@ -110,6 +127,8 @@ exports[`should render switch the default sorting option for anonymous users 1`]
 <ProjectsSortingSelect
   className="projects-topbar-item js-projects-sorting-select"
   defaultOption="name"
+  onChange={[Function]}
+  selectedSort="size"
   view="overall"
 />
 `;
@@ -118,6 +137,8 @@ exports[`should render switch the default sorting option for anonymous users 2`]
 <ProjectsSortingSelect
   className="projects-topbar-item js-projects-sorting-select"
   defaultOption="analysis_date"
+  onChange={[Function]}
+  selectedSort="size"
   view="leak"
 />
 `;

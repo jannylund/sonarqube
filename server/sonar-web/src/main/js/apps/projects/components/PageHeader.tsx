@@ -17,42 +17,45 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
-import classNames from 'classnames';
+import * as React from 'react';
+import * as classNames from 'classnames';
 import SearchFilterContainer from '../filters/SearchFilterContainer';
 import Tooltip from '../../../components/controls/Tooltip';
 import PerspectiveSelect from './PerspectiveSelect';
 import ProjectsSortingSelect from './ProjectsSortingSelect';
 import { translate } from '../../../helpers/l10n';
-/*:: import type { RawQuery } from '../../../helpers/query'; */
+import { RawQuery } from '../../../helpers/query';
 
-/*::
-type Props = {|
-  currentUser?: { isLoggedIn: boolean },
-  isFavorite?: boolean,
-  onPerspectiveChange: ({ view: string, visualization?: string }) => void,
-  organization?: { key: string },
-  projects: Array<*>,
-  projectsAppState: { loading: boolean, total?: number },
-  query: RawQuery,
-  onSortChange: (sort: string, desc: boolean) => void,
-  selectedSort: string,
-  view: string,
-  visualization?: string
-|};
-*/
+interface Props {
+  currentUser?: { isLoggedIn: boolean };
+  isFavorite?: boolean;
+  onPerspectiveChange: (x: { view: string; visualization?: string }) => void;
+  organization?: { key: string };
+  projects: Array<any>;
+  projectsAppState: { loading: boolean; total?: number };
+  query: RawQuery;
+  onSortChange: (sort: string, desc: boolean) => void;
+  selectedSort: string;
+  view: string;
+  visualization?: string;
+}
 
-export default function PageHeader(props /*: Props */) {
-  const renderSortingSelect = () => {
-    const { projectsAppState, projects, currentUser, view } = props;
-    const limitReached =
-      projects != null &&
-      projectsAppState.total != null &&
-      projects.length < projectsAppState.total;
-    const defaultOption = currentUser && currentUser.isLoggedIn ? 'name' : 'analysis_date';
-    if (view === 'visualizations' && !limitReached) {
-      return (
+export default function PageHeader(props: Props) {
+  const { projectsAppState, projects, currentUser, view } = props;
+  const limitReached =
+    projects != null && projectsAppState.total != null && projects.length < projectsAppState.total;
+  const defaultOption = currentUser && currentUser.isLoggedIn ? 'name' : 'analysis_date';
+
+  return (
+    <header className="page-header projects-topbar-items">
+      <PerspectiveSelect
+        className="projects-topbar-item js-projects-perspective-select"
+        onChange={props.onPerspectiveChange}
+        view={props.view}
+        visualization={props.visualization}
+      />
+
+      {view === 'visualizations' && !limitReached ? (
         <Tooltip overlay={translate('projects.sort.disabled')}>
           <div className="projects-topbar-item disabled">
             <ProjectsSortingSelect
@@ -64,29 +67,15 @@ export default function PageHeader(props /*: Props */) {
             />
           </div>
         </Tooltip>
-      );
-    }
-    return (
-      <ProjectsSortingSelect
-        className="projects-topbar-item js-projects-sorting-select"
-        defaultOption={defaultOption}
-        onChange={props.onSortChange}
-        selectedSort={props.selectedSort}
-        view={props.view}
-      />
-    );
-  };
-
-  return (
-    <header className="page-header projects-topbar-items">
-      <PerspectiveSelect
-        className="projects-topbar-item js-projects-perspective-select"
-        onChange={props.onPerspectiveChange}
-        view={props.view}
-        visualization={props.visualization}
-      />
-
-      {renderSortingSelect()}
+      ) : (
+        <ProjectsSortingSelect
+          className="projects-topbar-item js-projects-sorting-select"
+          defaultOption={defaultOption}
+          onChange={props.onSortChange}
+          selectedSort={props.selectedSort}
+          view={props.view}
+        />
+      )}
 
       <SearchFilterContainer
         className="projects-topbar-item projects-topbar-item-search"
