@@ -81,8 +81,6 @@ exports[`should render correctly with all data 1`] = `
         className="project-card-measure-number"
       >
         <Rating
-          muted={false}
-          small={false}
           value="1.0"
         />
       </div>
@@ -104,8 +102,6 @@ exports[`should render correctly with all data 1`] = `
         className="project-card-measure-number"
       >
         <Rating
-          muted={false}
-          small={false}
           value="1.0"
         />
       </div>
@@ -127,8 +123,6 @@ exports[`should render correctly with all data 1`] = `
         className="project-card-measure-number"
       >
         <Rating
-          muted={false}
-          small={false}
           value="1.0"
         />
       </div>
