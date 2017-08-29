@@ -17,12 +17,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
-import classNames from 'classnames';
+import * as React from 'react';
+import * as classNames from 'classnames';
 import { Link } from 'react-router';
 import DateFromNow from '../../../components/intl/DateFromNow';
-import DateTimeFormatter from '../../../components/intl/DateTimeFormatter.tsx';
+import DateTimeFormatter from '../../../components/intl/DateTimeFormatter';
 import ProjectCardQualityGate from './ProjectCardQualityGate';
 import ProjectCardLeakMeasures from './ProjectCardLeakMeasures';
 import FavoriteContainer from '../../../components/controls/FavoriteContainer';
@@ -31,37 +30,35 @@ import TagsList from '../../../components/tags/TagsList';
 import PrivateBadge from '../../../components/common/PrivateBadge';
 import { translate, translateWithParameters } from '../../../helpers/l10n';
 
-/*::
-type Props = {
-  measures: { [string]: string },
-  organization?: { key: string },
+interface Props {
+  measures?: { [key: string]: string };
+  organization?: { key: string };
   project?: {
-    analysisDate?: string,
-    key: string,
-    leakPeriodDate?: string,
-    name: string,
-    tags: Array<string>,
-    isFavorite?: boolean,
-    organization?: string,
-    visibility?: boolean
-  }
-};
-*/
+    analysisDate?: string;
+    key: string;
+    leakPeriodDate?: string;
+    name: string;
+    tags: Array<string>;
+    isFavorite?: boolean;
+    organization?: string;
+    visibility?: string;
+  };
+}
 
-export default function ProjectCardLeak({ measures, organization, project } /*: Props */) {
-  if (project == null) {
+export default function ProjectCardLeak({ measures, organization, project }: Props) {
+  if (project == undefined) {
     return null;
   }
 
   const isProjectAnalyzed = project.analysisDate != null;
   const isPrivate = project.visibility === 'private';
-  const hasLeakPeriodStart = project.leakPeriodDate != null;
+  const hasLeakPeriodStart = project.leakPeriodDate != undefined;
   const hasTags = project.tags.length > 0;
-  const showOrganization = organization == null && project.organization != null;
+  const showOrganization = organization == undefined && project.organization != undefined;
 
   // check for particular measures because only some measures can be loaded
   // if coming from visualizations tab
-  const areProjectMeasuresLoaded = measures != null && measures['new_bugs'];
+  const areProjectMeasuresLoaded = measures != undefined && measures['new_bugs'];
 
   const displayQualityGate = areProjectMeasuresLoaded && isProjectAnalyzed;
   const className = classNames('boxed-group', 'project-card', {
@@ -82,7 +79,7 @@ export default function ProjectCardLeak({ measures, organization, project } /*: 
           )}
           <Link to={{ pathname: '/dashboard', query: { id: project.key } }}>{project.name}</Link>
         </h2>
-        {displayQualityGate && <ProjectCardQualityGate status={measures['alert_status']} />}
+        {displayQualityGate && <ProjectCardQualityGate status={measures!['alert_status']} />}
         <div className="pull-right text-right">
           {isPrivate && <PrivateBadge className="spacer-left" tooltipPlacement="left" />}
           {hasTags && <TagsList tags={project.tags} customClass="spacer-left" />}
@@ -91,7 +88,7 @@ export default function ProjectCardLeak({ measures, organization, project } /*: 
         hasLeakPeriodStart && (
           <div className="project-card-dates note text-right pull-right">
             {hasLeakPeriodStart && (
-              <DateFromNow date={project.leakPeriodDate}>
+              <DateFromNow date={project.leakPeriodDate!}>
                 {fromNow => (
                   <span className="project-card-leak-date pull-right">
                     {translateWithParameters('projects.leak_period_x', fromNow)}
@@ -100,7 +97,7 @@ export default function ProjectCardLeak({ measures, organization, project } /*: 
               </DateFromNow>
             )}
             {isProjectAnalyzed && (
-              <DateTimeFormatter date={project.analysisDate}>
+              <DateTimeFormatter date={project.analysisDate!}>
                 {formattedDate => (
                   <span>
                     {translateWithParameters('projects.last_analysis_on_x', formattedDate)}
