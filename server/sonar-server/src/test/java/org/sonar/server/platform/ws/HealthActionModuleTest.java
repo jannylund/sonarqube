@@ -52,7 +52,7 @@ public class HealthActionModuleTest {
   }
 
   @Test
-  public void verify_installed_HealthChecks_implementations() {
+  public void verify_installed_NodeHealthChecks_implementations() {
     ComponentContainer container = new ComponentContainer();
 
     underTest.configure(container);
