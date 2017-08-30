@@ -18,7 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
 import LanguagesFilter from './LanguagesFilter';
 import {
   getProjectsAppFacetByProperty,
@@ -26,10 +25,10 @@ import {
   getLanguages
 } from '../../../store/rootReducer';
 
-const mapStateToProps = (state, ownProps) => ({
+const mapStateToProps = (state: any, ownProps: any) => ({
   languages: getLanguages(state),
   value: ownProps.query['languages'],
   facet: getProjectsAppFacetByProperty(state, 'languages'),
   maxFacetValue: getProjectsAppMaxFacetValue(state)
 });
-export default connect(mapStateToProps)(withRouter(LanguagesFilter));
+export default connect<any, any, any>(mapStateToProps)(LanguagesFilter);

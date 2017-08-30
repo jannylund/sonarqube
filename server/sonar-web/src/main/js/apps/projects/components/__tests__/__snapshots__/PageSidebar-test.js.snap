@@ -97,7 +97,7 @@ exports[`should render \`leak\` view correctly 1`] = `
       }
     }
   />
-  <Connect(withRouter(LanguagesFilter))
+  <Connect(LanguagesFilter)
     isFavorite={false}
     query={
       Object {
@@ -199,7 +199,7 @@ exports[`should render correctly 1`] = `
       }
     }
   />
-  <Connect(withRouter(LanguagesFilter))
+  <Connect(LanguagesFilter)
     isFavorite={true}
     query={
       Object {
