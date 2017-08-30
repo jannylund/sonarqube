@@ -454,7 +454,7 @@ public class CeProcessingSchedulerImplTest {
 
       @Override
       public void shutdown() {
-        throw new UnsupportedOperationException("shutdown() not implemented");
+        // Nothing to do
       }
 
       @Override

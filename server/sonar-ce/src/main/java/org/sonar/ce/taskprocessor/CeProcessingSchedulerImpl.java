@@ -72,11 +72,39 @@ public class CeProcessingSchedulerImpl implements CeProcessingScheduler, Startab
     }
   }
 
+  /**
+   * This method is stopping all the workers giving them a 50s delay before killing them.
+   */
+  @Override
+  public void stopScheduling() {
+    // Requesting all workers to stop
+    for (ChainingCallback chainingCallback : chainingCallbacks) {
+      chainingCallback.stop(false);
+    }
+
+    executorService.shutdown();
+
+    // Waiting for at most 50 secondes
+    try {
+      executorService.awaitTermination(50, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      LOG.debug("Interrupted exception, stopping ComputeEngine");
+    }
+
+    // Stopping the tasks
+    for (ChainingCallback chainingCallback : chainingCallbacks) {
+      chainingCallback.stop(true);
+    }
+  }
+
   @Override
   public void stop() {
+    // Requesting all workers to stop
     for (ChainingCallback chainingCallback : chainingCallbacks) {
-      chainingCallback.stop();
+      chainingCallback.stop(true);
     }
+    executorService.shutdown();
   }
 
   private class ChainingCallback implements FutureCallback<CeWorker.Result> {
@@ -149,10 +177,10 @@ public class CeProcessingSchedulerImpl implements CeProcessingScheduler, Startab
       return keepRunning.get();
     }
 
-    public void stop() {
+    public void stop(boolean interrupt) {
       this.keepRunning.set(false);
       if (workerFuture != null) {
-        workerFuture.cancel(false);
+        workerFuture.cancel(interrupt);
       }
     }
   }
