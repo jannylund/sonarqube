@@ -51,6 +51,7 @@ import static org.sonarqube.ws.WsProjects.SearchWsResponse.Component;
 import static org.sonarqube.ws.WsProjects.SearchWsResponse.newBuilder;
 import static org.sonarqube.ws.client.project.ProjectsWsParameters.ACTION_SEARCH;
 import static org.sonarqube.ws.client.project.ProjectsWsParameters.MAX_PAGE_SIZE;
+import static org.sonarqube.ws.client.project.ProjectsWsParameters.PARAM_LAST_ANALYSIS_BEFORE;
 import static org.sonarqube.ws.client.project.ProjectsWsParameters.PARAM_ORGANIZATION;
 import static org.sonarqube.ws.client.project.ProjectsWsParameters.PARAM_QUALIFIERS;
 import static org.sonarqube.ws.client.project.ProjectsWsParameters.PARAM_VISIBILITY;
@@ -97,6 +98,11 @@ public class SearchAction implements ProjectsWsAction {
       .setInternal(true)
       .setSince("6.4")
       .setPossibleValues(Visibility.getLabels());
+
+    action.createParam(PARAM_LAST_ANALYSIS_BEFORE)
+      .setDescription("Filter the projects for which last analysis is older than the given date (exclusive).<br> " +
+        "Format: date or datetime ISO formats.")
+      .setSince("6.6");
   }
 
   @Override
@@ -113,6 +119,7 @@ public class SearchAction implements ProjectsWsAction {
       .setPage(request.mandatoryParamAsInt(Param.PAGE))
       .setPageSize(request.mandatoryParamAsInt(Param.PAGE_SIZE))
       .setVisibility(request.param(PARAM_VISIBILITY))
+      .setLastAnalysisBefore(request.paramAsDateTime(PARAM_LAST_ANALYSIS_BEFORE))
       .build();
   }
 
@@ -135,6 +142,7 @@ public class SearchAction implements ProjectsWsAction {
       .setQualifiers(qualifiers.toArray(new String[qualifiers.size()]));
 
     setNullable(request.getVisibility(), v -> query.setPrivate(Visibility.isPrivate(v)));
+    setNullable(request.getLastAnalysisBefore(), d -> query.setLastAnalysisBefore(d.getTime()));
 
     return query.build();
   }

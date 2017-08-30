@@ -20,6 +20,7 @@
 package org.sonarqube.ws.client.project;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -36,6 +37,7 @@ public class SearchWsRequest {
   private final String visibility;
   private final Integer page;
   private final Integer pageSize;
+  private final Date lastAnalysisBefore;
 
   public SearchWsRequest(Builder builder) {
     this.organization = builder.organization;
@@ -44,6 +46,7 @@ public class SearchWsRequest {
     this.visibility = builder.visibility;
     this.page = builder.page;
     this.pageSize = builder.pageSize;
+    this.lastAnalysisBefore = builder.lastAnalysisBefore;
   }
 
   @CheckForNull
@@ -75,6 +78,11 @@ public class SearchWsRequest {
     return visibility;
   }
 
+  @CheckForNull
+  public Date getLastAnalysisBefore() {
+    return lastAnalysisBefore;
+  }
+
   public static Builder builder() {
     return new Builder();
   }
@@ -86,6 +94,7 @@ public class SearchWsRequest {
     private Integer pageSize;
     private String query;
     private String visibility;
+    private Date lastAnalysisBefore;
 
     public Builder setOrganization(@Nullable String organization) {
       this.organization = organization;
@@ -117,10 +126,14 @@ public class SearchWsRequest {
       return this;
     }
 
+    public Builder setLastAnalysisBefore(@Nullable Date lastAnalysisBefore) {
+      this.lastAnalysisBefore = lastAnalysisBefore;
+      return this;
+    }
+
     public SearchWsRequest build() {
       checkArgument(pageSize == null || pageSize <= MAX_PAGE_SIZE, "Page size must not be greater than %s", MAX_PAGE_SIZE);
       return new SearchWsRequest(this);
     }
   }
-
 }
