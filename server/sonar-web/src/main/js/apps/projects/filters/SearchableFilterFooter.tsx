@@ -17,48 +17,47 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-//@flow
-import React from 'react';
-import Select from 'react-select';
+import * as React from 'react';
+import * as Select from 'react-select';
+import * as PropTypes from 'prop-types';
 import { getFilterUrl } from './utils';
 import { translate } from '../../../helpers/l10n';
 
-/*::
-type Props = {
-  property: string,
-  query: {},
-  options: Array<{ label: string, value: string }>,
-  router: { push: ({ pathname: string, query?: {} }) => void },
-  onInputChange?: string => void,
-  onOpen?: void => void,
-  isLoading?: boolean,
-  isFavorite?: boolean,
-  organization?: {}
-};
-*/
+interface Props {
+  property: string;
+  query: { [x: string]: any };
+  options: Array<{ label: string; value: string }>;
+  onInputChange?: (query: string) => void;
+  onOpen?: () => void;
+  isLoading?: boolean;
+  isFavorite?: boolean;
+  organization?: {};
+}
 
-export default class SearchableFilterFooter extends React.PureComponent {
-  /*:: props: Props; */
+export default class SearchableFilterFooter extends React.PureComponent<Props> {
+  static contextTypes = {
+    router: PropTypes.object.isRequired
+  };
 
-  handleOptionChange /*: ({ value: string }) => void */ = ({ value }) => {
+  handleOptionChange = ({ value }: { value: string }) => {
     const urlOptions = (this.props.query[this.props.property] || []).concat(value).join(',');
     const path = getFilterUrl(this.props, { [this.props.property]: urlOptions });
-    this.props.router.push(path);
+    this.context.router.push(path);
   };
 
   render() {
     return (
       <div className="search-navigator-facet-footer projects-facet-footer">
         <Select
-          onChange={this.handleOptionChange}
           className="input-super-large"
-          placeholder={translate('search_verb')}
           clearable={false}
-          searchable={true}
+          isLoading={this.props.isLoading}
+          onChange={this.handleOptionChange}
           onInputChange={this.props.onInputChange}
           onOpen={this.props.onOpen}
-          isLoading={this.props.isLoading}
           options={this.props.options}
+          placeholder={translate('search_verb')}
+          searchable={true}
         />
       </div>
     );

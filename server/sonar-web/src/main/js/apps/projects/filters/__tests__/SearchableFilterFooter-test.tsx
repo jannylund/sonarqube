@@ -17,44 +17,41 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 import SearchableFilterFooter from '../SearchableFilterFooter';
 
-const languageOptions = [
-  { label: 'Flex', value: 'flex' },
-  { label: 'PHP', value: 'php' },
-  { label: 'Python', value: 'py' }
-];
-const tagOptions = [
-  { label: 'lang', value: 'lang' },
-  { label: 'sonar', value: 'sonar' },
+const options = [
+  { label: 'java', value: 'java' },
+  { label: 'js', value: 'js' },
   { label: 'csharp', value: 'csharp' }
 ];
-const fakeRouter = { push: () => {} };
 
-it('should render the languages without the ones in the facet', () => {
+it('should render items without the ones in the facet', () => {
   const wrapper = shallow(
     <SearchableFilterFooter
       property="languages"
-      query={{ languages: null }}
-      options={languageOptions}
-      router={fakeRouter}
-    />
+      query={{ languages: ['java'] }}
+      options={options}
+    />,
+    { context: { router: { push: jest.fn() } } }
   );
-  expect(wrapper).toMatchSnapshot();
-  expect(wrapper.find('Select').props().options.length).toBe(3);
+  expect(wrapper.find('Select').prop('options')).toMatchSnapshot();
 });
 
-it('should render the tags without the ones in the facet', () => {
+it('should render items without the ones in the facet', () => {
+  const push = jest.fn();
   const wrapper = shallow(
     <SearchableFilterFooter
-      property="tags"
-      query={{ tags: ['java'] }}
-      options={tagOptions}
-      isFavorite={true}
-    />
+      property="languages"
+      query={{ languages: ['java'] }}
+      options={options}
+    />,
+    { context: { router: { push } } }
   );
-  expect(wrapper).toMatchSnapshot();
-  expect(wrapper.find('Select').props().options.length).toBe(3);
+  (wrapper.find('Select').prop('onChange') as Function)({ value: 'js' });
+  expect(push).toBeCalledWith({
+    pathname: '/projects',
+    query: { languages: 'java,js' }
+  });
 });
