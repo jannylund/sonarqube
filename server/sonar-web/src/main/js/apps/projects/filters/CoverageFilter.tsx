@@ -25,7 +25,7 @@ import CoverageRating from '../../../components/ui/CoverageRating';
 import { getCoverageRatingLabel, getCoverageRatingAverageValue } from '../../../helpers/ratings';
 import { translate } from '../../../helpers/l10n';
 
-interface Props {
+export interface Props {
   className?: string;
   isFavorite?: boolean;
   organization?: { key: string };
