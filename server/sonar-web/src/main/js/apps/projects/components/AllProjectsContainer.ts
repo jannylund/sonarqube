@@ -18,8 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
 import AllProjects from './AllProjects';
 import { fetchProjects } from '../store/actions';
 
-export default connect(null, { fetchProjects })(withRouter(AllProjects));
+export default connect<null, any, any>(null, { fetchProjects })(AllProjects);
