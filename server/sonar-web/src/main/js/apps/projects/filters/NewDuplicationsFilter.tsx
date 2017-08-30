@@ -17,9 +17,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
-import DuplicationsFilter from './DuplicationsFilter';
+import * as React from 'react';
+import DuplicationsFilter, { Props } from './DuplicationsFilter';
 
-export default function NewDuplicationsFilter(props) {
+export default function NewDuplicationsFilter(props: Props) {
   return <DuplicationsFilter {...props} property="new_duplications" className="leak-facet-box" />;
 }

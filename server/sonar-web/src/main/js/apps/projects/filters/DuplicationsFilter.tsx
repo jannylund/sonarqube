@@ -28,7 +28,7 @@ import {
 import { translate } from '../../../helpers/l10n';
 import { Facet } from './Filter';
 
-interface Props {
+export interface Props {
   className?: string;
   isFavorite?: boolean;
   organization?: { key: string };
