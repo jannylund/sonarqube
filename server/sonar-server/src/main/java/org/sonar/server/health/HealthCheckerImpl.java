@@ -20,8 +20,13 @@
 package org.sonar.server.health;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import org.sonar.cluster.health.NodeHealth;
+import org.sonar.cluster.health.SharedHealthState;
 import org.sonar.server.platform.WebServer;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -36,36 +41,42 @@ public class HealthCheckerImpl implements HealthChecker {
   private final WebServer webServer;
   private final List<NodeHealthCheck> nodeHealthChecks;
   private final List<ClusterHealthCheck> clusterHealthChecks;
+  @CheckForNull
+  private final SharedHealthState sharedHealthState;
 
-  public HealthCheckerImpl(WebServer webServer) {
-    this(webServer, new NodeHealthCheck[0], new ClusterHealthCheck[0]);
-  }
-
-  public HealthCheckerImpl(WebServer webServer, NodeHealthCheck[] nodeHealthChecks) {
-    this(webServer, nodeHealthChecks, new ClusterHealthCheck[0]);
-  }
-
-  public HealthCheckerImpl(WebServer webServer, ClusterHealthCheck[] clusterHealthChecks) {
-    this(webServer, new NodeHealthCheck[0], clusterHealthChecks);
-  }
-
+  /**
+   * Constructor used by Pico in standalone mode.
+   */
   public HealthCheckerImpl(WebServer webServer, NodeHealthCheck[] nodeHealthChecks, ClusterHealthCheck[] clusterHealthChecks) {
+    this(webServer, nodeHealthChecks, clusterHealthChecks, null);
+  }
+
+  /**
+   * Constructor used by Pico in safe mode or in cluster mode.
+   */
+  public HealthCheckerImpl(WebServer webServer, NodeHealthCheck[] nodeHealthChecks, ClusterHealthCheck[] clusterHealthChecks,
+    @Nullable SharedHealthState sharedHealthState) {
     this.webServer = webServer;
+    this.sharedHealthState = sharedHealthState;
     this.nodeHealthChecks = copyOf(nodeHealthChecks);
     this.clusterHealthChecks = copyOf(clusterHealthChecks);
   }
 
   @Override
   public Health checkNode() {
-    return nodeHealthChecks.stream().map(NodeHealthCheck::check)
+    return nodeHealthChecks.stream()
+      .map(NodeHealthCheck::check)
       .reduce(Health.GREEN, HealthReducer.INSTANCE);
   }
 
   @Override
   public Health checkCluster() {
     checkState(!webServer.isStandalone(), "Clustering is not enabled");
+    checkState(sharedHealthState != null, "HealthState instance can't be null when clustering is enabled");
 
-    return clusterHealthChecks.stream().map(ClusterHealthCheck::check)
+    Set<NodeHealth> nodeHealths = sharedHealthState.readAll();
+    return clusterHealthChecks.stream()
+      .map(clusterHealthCheck -> clusterHealthCheck.check(nodeHealths))
       .reduce(Health.GREEN, HealthReducer.INSTANCE);
   }
 

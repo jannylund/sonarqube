@@ -19,6 +19,9 @@
  */
 package org.sonar.server.health;
 
+import java.util.Set;
+import org.sonar.cluster.health.NodeHealth;
+
 public interface ClusterHealthCheck {
-  Health check();
+  Health check(Set<NodeHealth> nodeHealths);
 }

@@ -19,7 +19,9 @@
  */
 package org.sonar.server.health;
 
+import java.util.Set;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
+import org.sonar.cluster.health.NodeHealth;
 import org.sonar.server.es.EsClient;
 
 import static org.sonar.server.health.Health.newHealthCheckBuilder;
@@ -41,6 +43,11 @@ public class EsStatusCheck implements NodeHealthCheck, ClusterHealthCheck {
 
   public EsStatusCheck(EsClient esClient) {
     this.esClient = esClient;
+  }
+
+  @Override
+  public Health check(Set<NodeHealth> nodeHealths) {
+    return check();
   }
 
   @Override
