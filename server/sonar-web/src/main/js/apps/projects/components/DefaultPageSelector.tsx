@@ -17,38 +17,30 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
+import * as React from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
+import * as PropTypes from 'prop-types';
 import AllProjectsContainer from './AllProjectsContainer';
 import { getCurrentUser } from '../../../store/rootReducer';
 import { isFavoriteSet, isAllSet } from '../../../helpers/storage';
 import { searchProjects } from '../../../api/components';
-/*:: import type { RawQuery } from '../../../helpers/query'; */
 
-/*::
-type Props = {
-  currentUser: { isLoggedIn: boolean },
-  location: { query: {} },
-  router: {
-    replace: (location: { pathname?: string, query?: RawQuery }) => void
-  }
-};
-*/
+interface Props {
+  currentUser: { isLoggedIn: boolean };
+  location: { query: { [x: string]: string } };
+}
 
-/*::
-type State = {
-  shouldBeRedirected?: boolean,
-  shouldForceSorting?: string
-};
-*/
+interface State {
+  shouldBeRedirected?: boolean;
+  shouldForceSorting?: string;
+}
 
-class DefaultPageSelector extends React.PureComponent {
-  /*:: props: Props; */
-  /*:: state: State; */
+class DefaultPageSelector extends React.PureComponent<Props, State> {
+  static contextTypes = {
+    router: PropTypes.object.isRequired
+  };
 
-  constructor(props /*: Props */) {
+  constructor(props: Props) {
     super(props);
     this.state = {};
   }
@@ -57,13 +49,13 @@ class DefaultPageSelector extends React.PureComponent {
     this.defineIfShouldBeRedirected();
   }
 
-  componentDidUpdate(prevProps /*: Props */) {
+  componentDidUpdate(prevProps: Props) {
     if (prevProps.location !== this.props.location) {
       this.defineIfShouldBeRedirected();
     } else if (this.state.shouldBeRedirected === true) {
-      this.props.router.replace({ ...this.props.location, pathname: '/projects/favorite' });
+      this.context.router.replace({ ...this.props.location, pathname: '/projects/favorite' });
     } else if (this.state.shouldForceSorting != null) {
-      this.props.router.replace({
+      this.context.router.replace({
         ...this.props.location,
         query: {
           ...this.props.location.query,
@@ -117,8 +109,10 @@ class DefaultPageSelector extends React.PureComponent {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state: any) => ({
   currentUser: getCurrentUser(state)
 });
 
-export default connect(mapStateToProps)(withRouter(DefaultPageSelector));
+export default connect<any, any, any>(mapStateToProps)(DefaultPageSelector);
+
+export const UnconnectedDefaultPageSelector = DefaultPageSelector;
