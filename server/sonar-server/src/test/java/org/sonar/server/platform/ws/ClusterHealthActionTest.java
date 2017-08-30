@@ -19,23 +19,32 @@
  */
 package org.sonar.server.platform.ws;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.IntStream;
 import org.junit.Test;
 import org.sonar.api.server.ws.WebService;
+import org.sonar.cluster.health.NodeDetails;
+import org.sonar.cluster.health.NodeHealth;
+import org.sonar.server.health.ClusterHealth;
 import org.sonar.server.health.Health;
 import org.sonar.server.health.HealthChecker;
 import org.sonar.server.platform.WebServer;
 import org.sonar.server.ws.TestResponse;
 import org.sonar.server.ws.WsActionTester;
-import org.sonar.test.JsonAssert;
 import org.sonarqube.ws.WsSystem;
 
+import static java.util.Collections.emptySet;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.sonar.api.utils.DateUtils.parseDateTime;
+import static org.sonar.cluster.health.NodeDetails.newNodeDetailsBuilder;
+import static org.sonar.cluster.health.NodeHealth.newNodeHealthBuilder;
+import static org.sonar.server.health.Health.newHealthCheckBuilder;
+import static org.sonar.test.JsonAssert.assertJson;
 
 public class ClusterHealthActionTest {
   private Random random = new Random();
@@ -69,9 +78,8 @@ public class ClusterHealthActionTest {
   @Test
   public void returns_200_if_clustering_enabled() {
     when(webServer.isStandalone()).thenReturn(false);
-    when(healthChecker.checkCluster()).thenReturn(Health.newHealthCheckBuilder()
-      .setStatus(Health.Status.GREEN)
-      .build());
+    when(healthChecker.checkCluster())
+      .thenReturn(new ClusterHealth(Health.GREEN, emptySet()));
 
     TestResponse response = underTest.newRequest().execute();
 
@@ -82,12 +90,11 @@ public class ClusterHealthActionTest {
   public void response_contains_status_and_causes_from_HealthChecker_checkCluster() {
     Health.Status randomStatus = Health.Status.values()[random.nextInt(Health.Status.values().length)];
     String[] causes = IntStream.range(0, random.nextInt(33)).mapToObj(i -> randomAlphanumeric(4)).toArray(String[]::new);
-    Health.Builder healthBuilder = Health.newHealthCheckBuilder()
+    Health.Builder healthBuilder = newHealthCheckBuilder()
       .setStatus(randomStatus);
     Arrays.stream(causes).forEach(healthBuilder::addCause);
     when(webServer.isStandalone()).thenReturn(false);
-    when(healthChecker.checkCluster()).thenReturn(healthBuilder
-      .build());
+    when(healthChecker.checkCluster()).thenReturn(new ClusterHealth(healthBuilder.build(), emptySet()));
 
     WsSystem.ClusterHealthResponse clusterHealthResponse = underTest.newRequest().executeProtobuf(WsSystem.ClusterHealthResponse.class);
     assertThat(clusterHealthResponse.getHealth().name()).isEqualTo(randomStatus.name());
@@ -99,14 +106,79 @@ public class ClusterHealthActionTest {
   @Test
   public void verify_response_example() {
     when(webServer.isStandalone()).thenReturn(false);
-    when(healthChecker.checkCluster()).thenReturn(Health.newHealthCheckBuilder()
-      .setStatus(Health.Status.RED)
-      .addCause("Application node app-1 is RED")
-      .build());
+    when(healthChecker.checkCluster())
+      .thenReturn(
+        new ClusterHealth(newHealthCheckBuilder()
+          .setStatus(Health.Status.RED)
+          .addCause("Application node app-1 is RED")
+          .build(),
+          ImmutableSet.of(
+            newNodeHealthBuilder()
+              .setStatus(NodeHealth.Status.RED)
+              .addCause("foo")
+              .setDetails(
+                newNodeDetailsBuilder()
+                  .setName("app-1")
+                  .setType(NodeDetails.Type.APPLICATION)
+                  .setHost("192.168.1.1")
+                  .setPort(999)
+                  .setStarted(parseDateTime("2015-08-13T23:34:59+0200").getTime())
+                  .build())
+              .setDate(1 + random.nextInt(888))
+              .build(),
+            newNodeHealthBuilder()
+              .setStatus(NodeHealth.Status.YELLOW)
+              .addCause("bar")
+              .setDetails(
+                newNodeDetailsBuilder()
+                  .setName("app-2")
+                  .setType(NodeDetails.Type.APPLICATION)
+                  .setHost("192.168.1.2")
+                  .setPort(999)
+                  .setStarted(parseDateTime("2015-08-13T23:34:59+0200").getTime())
+                  .build())
+              .setDate(1 + random.nextInt(888))
+              .build(),
+            newNodeHealthBuilder()
+              .setStatus(NodeHealth.Status.GREEN)
+              .setDetails(
+                newNodeDetailsBuilder()
+                  .setName("es-1")
+                  .setType(NodeDetails.Type.SEARCH)
+                  .setHost("192.168.1.3")
+                  .setPort(999)
+                  .setStarted(parseDateTime("2015-08-13T23:34:59+0200").getTime())
+                  .build())
+              .setDate(1 + random.nextInt(888))
+              .build(),
+            newNodeHealthBuilder()
+              .setStatus(NodeHealth.Status.GREEN)
+              .setDetails(
+                newNodeDetailsBuilder()
+                  .setName("es-2")
+                  .setType(NodeDetails.Type.SEARCH)
+                  .setHost("192.168.1.4")
+                  .setPort(999)
+                  .setStarted(parseDateTime("2015-08-13T23:34:59+0200").getTime())
+                  .build())
+              .setDate(1 + random.nextInt(888))
+              .build(),
+            newNodeHealthBuilder()
+              .setStatus(NodeHealth.Status.GREEN)
+              .setDetails(
+                newNodeDetailsBuilder()
+                  .setName("es-3")
+                  .setType(NodeDetails.Type.SEARCH)
+                  .setHost("192.168.1.5")
+                  .setPort(999)
+                  .setStarted(parseDateTime("2015-08-13T23:34:59+0200").getTime())
+                  .build())
+              .setDate(1 + random.nextInt(888))
+              .build())));
 
     TestResponse response = underTest.newRequest().execute();
 
-    JsonAssert.assertJson(response.getInput())
+    assertJson(response.getInput())
       .isSimilarTo(underTest.getDef().responseExampleAsString());
   }
 }
