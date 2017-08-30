@@ -17,18 +17,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 import { translate } from '../../../helpers/l10n';
 
-export default class SearchableFilterOption extends React.PureComponent {
-  static propTypes = {
-    optionKey: PropTypes.string.isRequired,
-    option: PropTypes.object
-  };
+interface Props {
+  option?: { name: string };
+  optionKey: string;
+}
 
-  render() {
-    const optionName = this.props.option ? this.props.option.name : this.props.optionKey;
-    return <span>{this.props.optionKey !== '<null>' ? optionName : translate('unknown')}</span>;
-  }
+export default function SearchableFilterOption(props: Props) {
+  const optionName = props.option ? props.option.name : props.optionKey;
+  return <span>{props.optionKey !== '<null>' ? optionName : translate('unknown')}</span>;
 }
