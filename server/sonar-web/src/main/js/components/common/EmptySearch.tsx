@@ -17,16 +17,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
+import * as React from 'react';
 import { translate } from '../../helpers/l10n';
 import './EmptySearch.css';
 
-const EmptySearch = () => (
-  <div className="empty-search">
-    <h3>{translate('no_results_search')}</h3>
-    <p className="big-spacer-top">{translate('no_results_search.2')}</p>
-  </div>
-);
-
-export default EmptySearch;
+export default function EmptySearch() {
+  return (
+    <div className="empty-search">
+      <h3>{translate('no_results_search')}</h3>
+      <p className="big-spacer-top">{translate('no_results_search.2')}</p>
+    </div>
+  );
+}
