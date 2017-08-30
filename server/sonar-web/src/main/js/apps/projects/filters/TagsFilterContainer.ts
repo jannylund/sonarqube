@@ -18,16 +18,15 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
 import TagsFilter from './TagsFilter';
 import {
   getProjectsAppFacetByProperty,
   getProjectsAppMaxFacetValue
 } from '../../../store/rootReducer';
 
-const mapStateToProps = (state, ownProps) => ({
+const mapStateToProps = (state: any, ownProps: any) => ({
   value: ownProps.query['tags'],
   facet: getProjectsAppFacetByProperty(state, 'tags'),
   maxFacetValue: getProjectsAppMaxFacetValue(state)
 });
-export default connect(mapStateToProps)(withRouter(TagsFilter));
+export default connect<any, any, any>(mapStateToProps)(TagsFilter);

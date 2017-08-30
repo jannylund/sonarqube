@@ -105,7 +105,7 @@ exports[`should render \`leak\` view correctly 1`] = `
       }
     }
   />
-  <Connect(withRouter(TagsFilter))
+  <Connect(TagsFilter)
     isFavorite={false}
     query={
       Object {
@@ -207,7 +207,7 @@ exports[`should render correctly 1`] = `
       }
     }
   />
-  <Connect(withRouter(TagsFilter))
+  <Connect(TagsFilter)
     isFavorite={true}
     query={
       Object {
