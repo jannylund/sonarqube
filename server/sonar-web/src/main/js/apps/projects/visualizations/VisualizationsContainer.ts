@@ -28,8 +28,8 @@ import {
   areThereCustomOrganizations
 } from '../../../store/rootReducer';
 
-const mapStateToProps = state => {
-  const projectKeys = getProjects(state) || [];
+const mapStateToProps = (state: any) => {
+  const projectKeys: string[] = getProjects(state) || [];
   const projects = projectKeys.map(key => {
     const component = getComponent(state, key);
     return {
@@ -46,4 +46,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(Visualizations);
+export default connect<any, any, any>(mapStateToProps)(Visualizations);
