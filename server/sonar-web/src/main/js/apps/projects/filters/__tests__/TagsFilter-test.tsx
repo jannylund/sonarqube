@@ -17,18 +17,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 import TagsFilter from '../TagsFilter';
 
 const tags = ['lang', 'sonar', 'csharp', 'dotnet', 'it', 'net'];
 const tagsFacet = { lang: 4, sonar: 3, csharp: 1 };
-const fakeRouter = { push: () => {} };
 
 it('should render the tags without the ones in the facet', () => {
-  const wrapper = shallow(
-    <TagsFilter query={{ tags: null }} router={fakeRouter} facet={tagsFacet} />
-  );
+  const wrapper = shallow(<TagsFilter query={{ tags: null }} facet={tagsFacet} />);
   expect(wrapper).toMatchSnapshot();
   wrapper.setState({ tags });
   expect(wrapper).toMatchSnapshot();
@@ -39,7 +36,6 @@ it('should render the tags facet with the selected tags', () => {
     <TagsFilter
       query={{ tags: ['lang', 'sonar'] }}
       value={['lang', 'sonar']}
-      router={fakeRouter}
       facet={tagsFacet}
       isFavorite={true}
     />
@@ -53,7 +49,6 @@ it('should render maximum 10 tags in the searchbox results', () => {
     <TagsFilter
       query={{ languages: ['java', 'ad'] }}
       value={['java', 'ad']}
-      router={fakeRouter}
       facet={{ ...tagsFacet, ad: 1 }}
       isFavorite={true}
     />

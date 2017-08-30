@@ -17,66 +17,63 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-//@flow
-import React from 'react';
+import * as React from 'react';
 import { debounce, difference, sortBy, size } from 'lodash';
-import Filter from './Filter';
+import Filter, { Facet } from './Filter';
 import FilterHeader from './FilterHeader';
 import SearchableFilterFooter from './SearchableFilterFooter';
 import SearchableFilterOption from './SearchableFilterOption';
 import { searchProjectTags } from '../../../api/components';
 import { translate } from '../../../helpers/l10n';
 
-/*::
-type Props = {
-  query: {},
-  router: { push: ({ pathname: string, query?: {} }) => void },
-  value?: Array<string>,
-  facet?: {},
-  isFavorite?: boolean,
-  organization?: {},
-  maxFacetValue?: number
-};
-*/
+interface Props {
+  facet?: Facet;
+  isFavorite?: boolean;
+  maxFacetValue?: number;
+  organization?: { key: string };
+  property?: string;
+  query: { [x: string]: any };
+  value?: string[];
+}
 
-/*::
-type State = {
-  isLoading: boolean,
-  search: string,
-  tags: Array<string>
-};
-*/
+interface State {
+  isLoading: boolean;
+  search: string;
+  tags: string[];
+}
 
 const LIST_SIZE = 10;
 
-export default class TagsFilter extends React.PureComponent {
-  /*:: props: Props; */
-  /*:: state: State; */
-  /*:: property: string; */
+export default class TagsFilter extends React.PureComponent<Props, State> {
+  mounted: boolean;
 
-  constructor(props /*: Props */) {
+  constructor(props: Props) {
     super(props);
     this.state = {
       isLoading: false,
       search: '',
       tags: []
     };
-    this.property = 'tags';
-    this.handleSearch = debounce(this.handleSearch.bind(this), 250);
+    this.handleSearch = debounce(this.handleSearch, 250);
   }
 
-  getSearchOptions(
-    facet /*: ?{} */,
-    tags /*: Array<string> */
-  ) /*: Array<{ label: string, value: string }> */ {
-    let tagsCopy = [...tags];
-    if (facet) {
-      tagsCopy = difference(tagsCopy, Object.keys(facet));
+  componentDidMount() {
+    this.mounted = true;
+  }
+
+  componentWillUnmount() {
+    this.mounted = false;
+  }
+
+  getSearchOptions = () => {
+    let tagsCopy = [...this.state.tags];
+    if (this.props.facet) {
+      tagsCopy = difference(tagsCopy, Object.keys(this.props.facet));
     }
     return tagsCopy.slice(0, LIST_SIZE).map(tag => ({ label: tag, value: tag }));
-  }
+  };
 
-  handleSearch = (search /*: ?string */) => {
+  handleSearch = (search?: string) => {
     if (search !== this.state.search) {
       search = search || '';
       this.setState({ search, isLoading: true });
@@ -84,23 +81,26 @@ export default class TagsFilter extends React.PureComponent {
         q: search,
         ps: size(this.props.facet || {}) + LIST_SIZE
       }).then(result => {
-        this.setState({ isLoading: false, tags: result.tags });
+        if (this.mounted) {
+          this.setState({ isLoading: false, tags: result.tags });
+        }
       });
     }
   };
 
-  getSortedOptions(facet /*: {} */ = {}) {
-    return sortBy(Object.keys(facet), [option => -facet[option], option => option]);
-  }
+  getSortedOptions = (facet: Facet = {}) =>
+    sortBy(Object.keys(facet), [(option: string) => -facet[option], (option: string) => option]);
 
-  getFacetValueForOption = (facet /*: {} */, option /*: string */) => facet[option];
+  getFacetValueForOption = (facet: Facet = {}, option: string) => facet[option];
 
-  renderOption = (option /*: string */) => <SearchableFilterOption optionKey={option} />;
+  renderOption = (option: string) => <SearchableFilterOption optionKey={option} />;
 
   render() {
+    const { property = 'tags' } = this.props;
+
     return (
       <Filter
-        property={this.property}
+        property={property}
         options={this.getSortedOptions(this.props.facet)}
         query={this.props.query}
         renderOption={this.renderOption}
@@ -113,15 +113,14 @@ export default class TagsFilter extends React.PureComponent {
         header={<FilterHeader name={translate('projects.facets.tags')} />}
         footer={
           <SearchableFilterFooter
-            property={this.property}
-            query={this.props.query}
-            options={this.getSearchOptions(this.props.facet, this.state.tags)}
-            isLoading={this.state.isLoading}
-            onOpen={this.handleSearch}
-            onInputChange={this.handleSearch}
             isFavorite={this.props.isFavorite}
+            isLoading={this.state.isLoading}
+            onInputChange={this.handleSearch}
+            onOpen={this.handleSearch}
             organization={this.props.organization}
-            router={this.props.router}
+            options={this.getSearchOptions()}
+            property={property}
+            query={this.props.query}
           />
         }
       />
