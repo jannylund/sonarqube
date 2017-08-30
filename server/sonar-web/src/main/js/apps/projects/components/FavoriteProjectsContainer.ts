@@ -18,14 +18,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
 import AllProjects from './AllProjects';
 import { getCurrentUser } from '../../../store/rootReducer';
 import { fetchProjects } from '../store/actions';
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state: any) => ({
   isFavorite: true,
   currentUser: getCurrentUser(state)
 });
 
-export default connect(mapStateToProps, { fetchProjects })(withRouter(AllProjects));
+export default connect<any, any, any>(mapStateToProps, { fetchProjects })(AllProjects);
