@@ -193,7 +193,6 @@ exports[`should render correctly 1`] = `
   />
   <SizeFilter
     isFavorite={true}
-    property="size"
     query={
       Object {
         "size": "3",
