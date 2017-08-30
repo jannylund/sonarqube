@@ -91,7 +91,6 @@ exports[`should render \`leak\` view correctly 1`] = `
   />
   <NewLinesFilter
     isFavorite={false}
-    property="new_lines"
     query={
       Object {
         "view": "leak",
