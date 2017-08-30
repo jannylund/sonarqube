@@ -17,19 +17,21 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
-import SimpleBubbleChart from './SimpleBubbleChart';
+import * as React from 'react';
+import SimpleBubbleChart, { Project } from './SimpleBubbleChart';
 
-export default class Duplications extends React.PureComponent {
-  render() {
-    return (
-      <SimpleBubbleChart
-        {...this.props}
-        xMetric={{ key: 'ncloc', type: 'SHORT_INT' }}
-        yMetric={{ key: 'duplicated_lines', type: 'SHORT_INT' }}
-        sizeMetric={{ key: 'duplicated_blocks', type: 'SHORT_INT' }}
-      />
-    );
-  }
+interface Props {
+  displayOrganizations: boolean;
+  projects: Project[];
+}
+
+export default function Duplications(props: Props) {
+  return (
+    <SimpleBubbleChart
+      {...props}
+      xMetric={{ key: 'ncloc', type: 'SHORT_INT' }}
+      yMetric={{ key: 'duplicated_lines', type: 'SHORT_INT' }}
+      sizeMetric={{ key: 'duplicated_blocks', type: 'SHORT_INT' }}
+    />
+  );
 }
