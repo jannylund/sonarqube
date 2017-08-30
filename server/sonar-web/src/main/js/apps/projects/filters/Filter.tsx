@@ -24,8 +24,8 @@ import { getFilterUrl } from './utils';
 import { formatMeasure } from '../../../helpers/measures';
 import { translate } from '../../../helpers/l10n';
 
-type Option = string | number;
-type Facet = { [x: string]: number };
+export type Option = string | number;
+export type Facet = { [x: string]: number };
 
 interface Props {
   property: string;

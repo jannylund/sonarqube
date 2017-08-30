@@ -178,7 +178,6 @@ exports[`should render correctly 1`] = `
   />
   <CoverageFilter
     isFavorite={true}
-    property="coverage"
     query={
       Object {
         "size": "3",
