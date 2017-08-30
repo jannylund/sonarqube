@@ -17,55 +17,49 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-//@flow
-import React from 'react';
+import * as React from 'react';
 import { difference, sortBy } from 'lodash';
-import Filter from './Filter';
+import Filter, { Facet } from './Filter';
 import FilterHeader from './FilterHeader';
 import SearchableFilterFooter from './SearchableFilterFooter';
 import SearchableFilterOption from './SearchableFilterOption';
 import { getLanguageByKey } from '../../../store/languages/reducer';
 import { translate } from '../../../helpers/l10n';
 
-/*::
-type Props = {
-  query: {},
-  languages: {},
-  router: { push: ({ pathname: string, query?: {} }) => void },
-  value?: Array<string>,
-  facet?: {},
-  isFavorite?: boolean,
-  organization?: {},
-  maxFacetValue?: number
-};
-*/
+interface Languages {
+  [key: string]: { key: string; name: string };
+}
+
+interface Props {
+  facet?: Facet;
+  isFavorite?: boolean;
+  languages: Languages;
+  maxFacetValue?: number;
+  organization?: { key: string };
+  property?: string;
+  query: { [x: string]: any };
+  value?: Array<string>;
+}
 
 const LIST_SIZE = 10;
 
-export default class LanguagesFilter extends React.PureComponent {
-  /*:: props: Props; */
-  property = 'languages';
-
-  getSearchOptions(
-    facet /*: ?{} */,
-    languages /*: {} */
-  ) /*: Array<{ label: string, value: string }> */ {
-    let languageKeys = Object.keys(languages);
-    if (facet) {
-      languageKeys = difference(languageKeys, Object.keys(facet));
+export default class LanguagesFilter extends React.Component<Props> {
+  getSearchOptions = () => {
+    let languageKeys = Object.keys(this.props.languages);
+    if (this.props.facet) {
+      languageKeys = difference(languageKeys, Object.keys(this.props.facet));
     }
     return languageKeys
       .slice(0, LIST_SIZE)
-      .map(key => ({ label: languages[key].name, value: key }));
-  }
+      .map(key => ({ label: this.props.languages[key].name, value: key }));
+  };
 
-  getSortedOptions(facet /*: {} */ = {}) {
-    return sortBy(Object.keys(facet), [option => -facet[option], option => option]);
-  }
+  getSortedOptions = (facet: Facet = {}) =>
+    sortBy(Object.keys(facet), [(option: string) => -facet[option], (option: string) => option]);
 
-  getFacetValueForOption = (facet /*: {} */ = {}, option /*: string */) => facet[option];
+  getFacetValueForOption = (facet: Facet = {}, option: string) => facet[option];
 
-  renderOption = (option /*: string */) => (
+  renderOption = (option: string) => (
     <SearchableFilterOption
       optionKey={option}
       option={getLanguageByKey(this.props.languages, option)}
@@ -73,9 +67,11 @@ export default class LanguagesFilter extends React.PureComponent {
   );
 
   render() {
+    const { property = 'languages' } = this.props;
+
     return (
       <Filter
-        property={this.property}
+        property={property}
         options={this.getSortedOptions(this.props.facet)}
         query={this.props.query}
         renderOption={this.renderOption}
@@ -88,12 +84,11 @@ export default class LanguagesFilter extends React.PureComponent {
         header={<FilterHeader name={translate('projects.facets.languages')} />}
         footer={
           <SearchableFilterFooter
-            property={this.property}
-            query={this.props.query}
-            options={this.getSearchOptions(this.props.facet, this.props.languages)}
             isFavorite={this.props.isFavorite}
             organization={this.props.organization}
-            router={this.props.router}
+            options={this.getSearchOptions()}
+            property={property}
+            query={this.props.query}
           />
         }
       />

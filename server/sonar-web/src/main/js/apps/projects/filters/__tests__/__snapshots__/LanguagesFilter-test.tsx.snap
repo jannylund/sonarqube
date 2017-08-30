@@ -66,11 +66,6 @@ exports[`should render maximum 10 languages in the searchbox results 1`] = `
           ],
         }
       }
-      router={
-        Object {
-          "push": [Function],
-        }
-      }
     />
   }
   getFacetValueForOption={[Function]}
@@ -142,11 +137,6 @@ exports[`should render the languages facet with the selected languages 1`] = `
             "java",
             "cs",
           ],
-        }
-      }
-      router={
-        Object {
-          "push": [Function],
         }
       }
     />
@@ -325,11 +315,6 @@ exports[`should render the languages facet with the selected languages 2`] = `
         ],
       }
     }
-    router={
-      Object {
-        "push": [Function],
-      }
-    }
   />
 </div>
 `;
@@ -365,11 +350,6 @@ exports[`should render the languages without the ones in the facet 1`] = `
       query={
         Object {
           "languages": null,
-        }
-      }
-      router={
-        Object {
-          "push": [Function],
         }
       }
     />

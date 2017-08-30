@@ -17,47 +17,24 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 import LanguagesFilter from '../LanguagesFilter';
 
 const languages = {
-  java: {
-    key: 'java',
-    name: 'Java'
-  },
-  cs: {
-    key: 'cs',
-    name: 'C#'
-  },
-  js: {
-    key: 'js',
-    name: 'JavaScript'
-  },
-  flex: {
-    key: 'flex',
-    name: 'Flex'
-  },
-  php: {
-    key: 'php',
-    name: 'PHP'
-  },
-  py: {
-    key: 'py',
-    name: 'Python'
-  }
+  java: { key: 'java', name: 'Java' },
+  cs: { key: 'cs', name: 'C#' },
+  js: { key: 'js', name: 'JavaScript' },
+  flex: { key: 'flex', name: 'Flex' },
+  php: { key: 'php', name: 'PHP' },
+  py: { key: 'py', name: 'Python' }
 };
+
 const languagesFacet = { java: 39, cs: 4, js: 1 };
-const fakeRouter = { push: () => {} };
 
 it('should render the languages without the ones in the facet', () => {
   const wrapper = shallow(
-    <LanguagesFilter
-      query={{ languages: null }}
-      languages={languages}
-      router={fakeRouter}
-      facet={languagesFacet}
-    />
+    <LanguagesFilter query={{ languages: null }} languages={languages} facet={languagesFacet} />
   );
   expect(wrapper).toMatchSnapshot();
 });
@@ -68,7 +45,6 @@ it('should render the languages facet with the selected languages', () => {
       query={{ languages: ['java', 'cs'] }}
       value={['java', 'cs']}
       languages={languages}
-      router={fakeRouter}
       facet={languagesFacet}
       isFavorite={true}
     />
@@ -94,7 +70,6 @@ it('should render maximum 10 languages in the searchbox results', () => {
         k: { key: 'k', name: 'k' },
         l: { key: 'l', name: 'l' }
       }}
-      router={fakeRouter}
       facet={{ ...languagesFacet, g: 1 }}
       isFavorite={true}
     />
