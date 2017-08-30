@@ -186,7 +186,6 @@ exports[`should render correctly 1`] = `
   />
   <DuplicationsFilter
     isFavorite={true}
-    property="duplications"
     query={
       Object {
         "size": "3",
