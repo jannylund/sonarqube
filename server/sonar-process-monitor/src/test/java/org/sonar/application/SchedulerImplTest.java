@@ -83,7 +83,6 @@ public class SchedulerImplTest {
 
   @Test
   public void start_and_stop_sequence_of_ES_WEB_CE_in_order() throws Exception {
-    enableAllProcesses();
     SchedulerImpl underTest = newScheduler();
     underTest.schedule();
 
@@ -120,10 +119,6 @@ public class SchedulerImplTest {
     underTest.awaitTermination();
   }
 
-  private void enableAllProcesses() {
-    settings.set(CLUSTER_ENABLED, "true");
-  }
-
   @Test
   public void all_processes_are_stopped_if_one_process_goes_down() throws Exception {
     Scheduler underTest = startAll();
@@ -141,7 +136,6 @@ public class SchedulerImplTest {
 
   @Test
   public void all_processes_are_stopped_if_one_process_fails_to_start() throws Exception {
-    enableAllProcesses();
     SchedulerImpl underTest = newScheduler();
     processLauncher.makeStartupFail = COMPUTE_ENGINE;
 
@@ -233,7 +227,6 @@ public class SchedulerImplTest {
     assertThat(appState.tryToLockWebLeader()).isTrue();
 
     appState.setOperational(ProcessId.ELASTICSEARCH);
-    enableAllProcesses();
     SchedulerImpl underTest = newScheduler();
     underTest.schedule();
 
@@ -292,7 +285,6 @@ public class SchedulerImplTest {
   }
 
   private Scheduler startAll() throws InterruptedException {
-    enableAllProcesses();
     SchedulerImpl scheduler = newScheduler();
     scheduler.schedule();
     processLauncher.waitForProcess(ELASTICSEARCH).operational = true;
