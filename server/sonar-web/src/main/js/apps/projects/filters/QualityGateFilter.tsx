@@ -17,40 +17,39 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 import FilterContainer from './FilterContainer';
 import FilterHeader from './FilterHeader';
 import Level from '../../../components/ui/Level';
 import { translate } from '../../../helpers/l10n';
+import { Facet } from './Filter';
 
-export default class QualityGateFilter extends React.PureComponent {
-  static propTypes = {
-    query: PropTypes.object.isRequired,
-    isFavorite: PropTypes.bool,
-    organization: PropTypes.object
-  };
+export interface Props {
+  className?: string;
+  isFavorite?: boolean;
+  organization?: { key: string };
+  query: { [x: string]: any };
+}
 
-  getFacetValueForOption(facet, option) {
-    return facet[option];
-  }
+export default function QualityGateFilter(props: Props) {
+  return (
+    <FilterContainer
+      property="gate"
+      options={['OK', 'WARN', 'ERROR']}
+      query={props.query}
+      renderOption={renderOption}
+      isFavorite={props.isFavorite}
+      organization={props.organization}
+      getFacetValueForOption={getFacetValueForOption}
+      header={<FilterHeader name={translate('projects.facets.quality_gate')} />}
+    />
+  );
+}
 
-  renderOption(option, selected) {
-    return <Level level={option} small={true} muted={!selected} />;
-  }
+function getFacetValueForOption(facet: Facet, option: string) {
+  return facet[option];
+}
 
-  render() {
-    return (
-      <FilterContainer
-        property="gate"
-        options={['OK', 'WARN', 'ERROR']}
-        query={this.props.query}
-        renderOption={this.renderOption}
-        isFavorite={this.props.isFavorite}
-        organization={this.props.organization}
-        getFacetValueForOption={this.getFacetValueForOption}
-        header={<FilterHeader name={translate('projects.facets.quality_gate')} />}
-      />
-    );
-  }
+function renderOption(option: string, selected: boolean) {
+  return <Level level={option} small={true} muted={!selected} />;
 }
