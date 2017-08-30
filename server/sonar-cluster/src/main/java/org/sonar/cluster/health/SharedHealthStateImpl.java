@@ -44,18 +44,18 @@ public class SharedHealthStateImpl implements SharedHealthState {
     requireNonNull(nodeHealth, "nodeHealth can't be null");
 
     Map<String, NodeHealth> sqHealthState = hazelcastClient.getReplicatedMap(SQ_HEALTH_STATE_REPLICATED_MAP_IDENTIFIER);
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("Reading {} and adding {}", new HashMap<>(sqHealthState), nodeHealth);
-    }
+//    if (LOG.isTraceEnabled()) {
+      LOG.info("Reading {} and adding {}", new HashMap<>(sqHealthState), nodeHealth);
+//    }
     sqHealthState.put(hazelcastClient.getClientUUID(), nodeHealth);
   }
 
   @Override
   public Set<NodeHealth> readAll() {
     Map<String, NodeHealth> sqHealthState = hazelcastClient.getReplicatedMap(SQ_HEALTH_STATE_REPLICATED_MAP_IDENTIFIER);
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("Reading {}", new HashMap<>(sqHealthState));
-    }
+//    if (LOG.isTraceEnabled()) {
+      LOG.info("Reading {}", new HashMap<>(sqHealthState));
+//    }
     return ImmutableSet.copyOf(sqHealthState.values());
   }
 }
