@@ -27,7 +27,7 @@ interface Props {
   className?: string;
   query: { search?: string };
   isFavorite?: boolean;
-  organization?: {};
+  organization?: { key: string };
 }
 
 export default class SearchFilterContainer extends React.PureComponent<Props> {
