@@ -17,8 +17,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
+import * as React from 'react';
 import Risk from './Risk';
 import Reliability from './Reliability';
 import Security from './Security';
@@ -26,20 +25,20 @@ import Maintainability from './Maintainability';
 import Coverage from './Coverage';
 import Duplications from './Duplications';
 import { localizeSorting } from '../utils';
+import { Project } from '../types';
 import { translate, translateWithParameters } from '../../../helpers/l10n';
 
-export default class Visualizations extends React.PureComponent {
-  /*:: props: {
-    displayOrganizations: boolean,
-    projects?: Array<*>,
-    sort?: string,
-    total?: number,
-    visualization: string
-  };
-*/
+interface Props {
+  displayOrganizations: boolean;
+  projects?: Project[];
+  sort?: string;
+  total?: number;
+  visualization: string;
+}
 
-  renderVisualization(projects /*: Array<*> */) {
-    const visualizationToComponent = {
+export default class Visualizations extends React.PureComponent<Props> {
+  renderVisualization(projects: Project[]) {
+    const visualizationToComponent: { [x: string]: any } = {
       risk: Risk,
       reliability: Reliability,
       security: Security,
@@ -66,8 +65,7 @@ export default class Visualizations extends React.PureComponent {
           <p className="note spacer-top">
             {translateWithParameters(
               'projects.limited_set_of_projects',
-              // $FlowFixMe
-              projects.length,
+              projects!.length,
               localizeSorting(sort)
             )}
           </p>

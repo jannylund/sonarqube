@@ -24,17 +24,11 @@ import { formatMeasure } from '../../../helpers/measures';
 import { translate, translateWithParameters } from '../../../helpers/l10n';
 import { RATING_COLORS } from '../../../helpers/constants';
 import { getProjectUrl } from '../../../helpers/urls';
+import { Project } from '../types';
 
 export interface Metric {
   key: string;
   type: string;
-}
-
-export interface Project {
-  key: string;
-  measures: { [key: string]: string };
-  name: string;
-  organization?: { name: string };
 }
 
 interface Props {

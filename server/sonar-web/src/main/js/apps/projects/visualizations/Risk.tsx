@@ -18,6 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import * as React from 'react';
+import { Project } from '../types';
 import ColorRatingsLegend from '../../../components/charts/ColorRatingsLegend';
 import BubbleChart from '../../../components/charts/BubbleChart';
 import { formatMeasure } from '../../../helpers/measures';
@@ -34,13 +35,6 @@ const SIZE_METRIC_TYPE = 'SHORT_INT';
 const COLOR_METRIC_1 = 'reliability_rating';
 const COLOR_METRIC_2 = 'security_rating';
 const COLOR_METRIC_TYPE = 'RATING';
-
-interface Project {
-  key: string;
-  measures: { [key: string]: string };
-  name: string;
-  organization?: { name: string };
-}
 
 interface Props {
   displayOrganizations: boolean;
