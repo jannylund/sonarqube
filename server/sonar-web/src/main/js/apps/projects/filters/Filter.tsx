@@ -17,60 +17,58 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import * as React from 'react';
+import * as classNames from 'classnames';
 import { Link } from 'react-router';
 import { getFilterUrl } from './utils';
 import { formatMeasure } from '../../../helpers/measures';
 import { translate } from '../../../helpers/l10n';
 
-export default class Filter extends React.PureComponent {
-  static propTypes = {
-    property: PropTypes.string.isRequired,
-    className: PropTypes.string,
-    options: PropTypes.array.isRequired,
-    query: PropTypes.object.isRequired,
-    renderOption: PropTypes.func.isRequired,
+type Option = string | number;
+type Facet = { [x: string]: number };
 
-    value: PropTypes.any,
-    facet: PropTypes.object,
-    maxFacetValue: PropTypes.number,
-    optionClassName: PropTypes.string,
-    isFavorite: PropTypes.bool,
-    organization: PropTypes.object,
+interface Props {
+  property: string;
+  className?: string;
+  options: Option[];
+  query: { [x: string]: any };
+  renderOption: (option: Option, isSelected: boolean) => React.ReactNode;
 
-    getFacetValueForOption: PropTypes.func,
+  value?: Option | Option[];
+  facet?: Facet;
+  maxFacetValue?: number;
+  optionClassName?: string;
+  isFavorite?: boolean;
+  organization?: { key: string };
 
-    halfWidth: PropTypes.bool,
-    highlightUnder: PropTypes.number,
-    highlightUnderMax: PropTypes.number,
+  getFacetValueForOption?: (facet: Facet, option: Option) => void;
 
-    header: PropTypes.object,
-    footer: PropTypes.object
-  };
+  halfWidth?: boolean;
+  highlightUnder?: number;
+  highlightUnderMax?: number;
 
-  static defaultProps = {
-    halfWidth: false
-  };
+  header?: React.ReactNode;
+  footer?: React.ReactNode;
+}
 
-  isSelected(option) {
+export default class Filter extends React.PureComponent<Props> {
+  isSelected(option: Option): boolean {
     const { value } = this.props;
     return Array.isArray(value) ? value.includes(option) : option === value;
   }
 
-  highlightUnder(option) {
+  highlightUnder(option?: Option): boolean {
     return (
       this.props.highlightUnder != null &&
-      option !== null &&
+      option != null &&
       option > this.props.highlightUnder &&
       (this.props.highlightUnderMax == null || option < this.props.highlightUnderMax)
     );
   }
 
-  blurOnClick = (evt /*: Event & { currentTarget: HTMLElement } */) => evt.currentTarget.blur();
+  blurOnClick = (event: React.SyntheticEvent<HTMLElement>) => event.currentTarget.blur();
 
-  getPath(option) {
+  getPath(option: Option) {
     const { property, value } = this.props;
     let urlOption;
 
@@ -86,8 +84,8 @@ export default class Filter extends React.PureComponent {
     return getFilterUrl(this.props, { [property]: urlOption });
   }
 
-  renderOptionBar(facetValue) {
-    if (facetValue == null || !this.props.maxFacetValue) {
+  renderOptionBar(facetValue: number | undefined) {
+    if (facetValue == undefined || !this.props.maxFacetValue) {
       return null;
     }
     return (
@@ -100,7 +98,7 @@ export default class Filter extends React.PureComponent {
     );
   }
 
-  renderOption(option) {
+  renderOption(option: Option) {
     const { facet, getFacetValueForOption, value } = this.props;
     const className = classNames(
       'facet',
@@ -115,9 +113,13 @@ export default class Filter extends React.PureComponent {
 
     const path = this.getPath(option);
     const facetValue =
-      facet && getFacetValueForOption ? getFacetValueForOption(facet, option) : null;
+      facet && getFacetValueForOption ? getFacetValueForOption(facet, option) : undefined;
 
-    const isUnderSelectedOption = this.highlightUnder(value) && option > value;
+    const isUnderSelectedOption =
+      typeof value === 'number' &&
+      typeof option === 'number' &&
+      this.highlightUnder(value) &&
+      option > value;
 
     return (
       <Link
@@ -139,7 +141,7 @@ export default class Filter extends React.PureComponent {
     );
   }
 
-  renderOptions() {
+  renderOptions = () => {
     const { options, highlightUnder } = this.props;
     if (options && options.length > 0) {
       if (highlightUnder != null) {
@@ -166,7 +168,7 @@ export default class Filter extends React.PureComponent {
     } else {
       return <div className="search-navigator-facet-empty">{translate('no_results')}</div>;
     }
-  }
+  };
 
   render() {
     return (
