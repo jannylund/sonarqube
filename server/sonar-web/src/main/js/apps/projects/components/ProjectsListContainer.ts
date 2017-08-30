@@ -21,7 +21,9 @@ import { connect } from 'react-redux';
 import ProjectsList from './ProjectsList';
 import { getProjects, getProjectsAppState } from '../../../store/rootReducer';
 
-export default connect(state => ({
+const mapStateToProps = (state: any) => ({
   projects: getProjects(state),
   total: getProjectsAppState(state).total
-}))(ProjectsList);
+});
+
+export default connect<any, any, any>(mapStateToProps)(ProjectsList);
