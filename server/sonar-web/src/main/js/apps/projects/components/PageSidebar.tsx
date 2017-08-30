@@ -17,8 +17,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-//@flow
-import React from 'react';
+import * as React from 'react';
 import { Link } from 'react-router';
 import FavoriteFilterContainer from './FavoriteFilterContainer';
 import LanguagesFilterContainer from '../filters/LanguagesFilterContainer';
@@ -37,21 +36,18 @@ import SecurityFilter from '../filters/SecurityFilter';
 import SizeFilter from '../filters/SizeFilter';
 import TagsFilterContainer from '../filters/TagsFilterContainer';
 import { translate } from '../../../helpers/l10n';
-/*:: import type { RawQuery } from '../../../helpers/query'; */
+import { RawQuery } from '../../../helpers/query';
 
-/*::
-type Props = {
-  isFavorite: boolean,
-  organization?: { key: string },
-  query: RawQuery,
-  view: string,
-  visualization: string
-};
-*/
+interface Props {
+  isFavorite: boolean;
+  organization?: { key: string };
+  query: RawQuery;
+  view: string;
+  visualization: string;
+}
 
-export default function PageSidebar(
-  { query, isFavorite, organization, view, visualization } /*: Props */
-) {
+export default function PageSidebar(props: Props) {
+  const { query, isFavorite, organization, view, visualization } = props;
   const isFiltered = Object.keys(query)
     .filter(key => !['view', 'visualization', 'sort'].includes(key))
     .some(key => query[key] != null);
@@ -60,12 +56,11 @@ export default function PageSidebar(
   const pathname = basePathName + (isFavorite ? '/favorite' : '');
   const facetProps = { query, isFavorite, organization };
 
-  let linkQuery;
+  let linkQuery: RawQuery | undefined = undefined;
   if (view !== 'overall') {
     linkQuery = { view };
 
     if (view === 'visualizations') {
-      // $FlowFixMe
       linkQuery.visualization = visualization;
     }
   }
