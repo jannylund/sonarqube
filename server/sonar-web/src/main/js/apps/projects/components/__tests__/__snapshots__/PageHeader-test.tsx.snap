@@ -16,7 +16,7 @@ exports[`should render correctly 1`] = `
     selectedSort="size"
     view="overall"
   />
-  <withRouter(SearchFilterContainer)
+  <SearchFilterContainer
     className="projects-topbar-item projects-topbar-item-search"
     query={
       Object {
@@ -56,7 +56,7 @@ exports[`should render correctly while loading 1`] = `
     selectedSort="size"
     view="overall"
   />
-  <withRouter(SearchFilterContainer)
+  <SearchFilterContainer
     className="projects-topbar-item projects-topbar-item-search"
     query={
       Object {
@@ -109,7 +109,7 @@ exports[`should render disabled sorting options for visualizations 1`] = `
       />
     </div>
   </Tooltip>
-  <withRouter(SearchFilterContainer)
+  <SearchFilterContainer
     className="projects-topbar-item projects-topbar-item-search"
     query={
       Object {

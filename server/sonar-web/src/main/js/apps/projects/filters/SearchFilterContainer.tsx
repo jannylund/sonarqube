@@ -17,36 +17,33 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-//@flow
-import React from 'react';
-import { withRouter } from 'react-router';
+import * as React from 'react';
+import * as PropTypes from 'prop-types';
 import { debounce } from 'lodash';
 import { getFilterUrl } from './utils';
 import SearchFilter from './SearchFilter';
 
-/*::
-type Props = {|
-  className?: string,
-  query: { search?: string },
-  router: { push: ({ pathname: string }) => void },
-  isFavorite?: boolean,
-  organization?: {}
-|};
-*/
+interface Props {
+  className?: string;
+  query: { search?: string };
+  isFavorite?: boolean;
+  organization?: {};
+}
 
-class SearchFilterContainer extends React.PureComponent {
-  /*:: handleSearch: (userQuery?: string) => void; */
-  /*:: props: Props; */
+export default class SearchFilterContainer extends React.PureComponent<Props> {
+  static contextTypes = {
+    router: PropTypes.object.isRequired
+  };
 
-  constructor(props /*: Props */) {
+  constructor(props: Props) {
     super(props);
-    this.handleSearch = debounce(this.handleSearch.bind(this), 250);
+    this.handleSearch = debounce(this.handleSearch, 250);
   }
 
-  handleSearch(userQuery /*: ?string */) {
-    const path = getFilterUrl(this.props, { search: userQuery || null });
-    this.props.router.push(path);
-  }
+  handleSearch = (userQuery?: string) => {
+    const path = getFilterUrl(this.props, { search: userQuery });
+    this.context.router.push(path);
+  };
 
   render() {
     return (
@@ -58,5 +55,3 @@ class SearchFilterContainer extends React.PureComponent {
     );
   }
 }
-
-export default withRouter(SearchFilterContainer);
