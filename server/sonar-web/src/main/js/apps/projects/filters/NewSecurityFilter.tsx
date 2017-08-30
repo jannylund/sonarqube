@@ -17,12 +17,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
+import * as React from 'react';
 import VulnerabilityIcon from '../../../components/icons-components/VulnerabilityIcon';
 import IssuesFilter from './IssuesFilter';
 import { translate } from '../../../helpers/l10n';
 
-export default function NewSecurityFilter(props) {
+interface Props {
+  className?: string;
+  isFavorite?: boolean;
+  organization?: { key: string };
+  query: { [x: string]: any };
+}
+
+export default function NewSecurityFilter(props: Props) {
   return (
     <IssuesFilter
       {...props}
