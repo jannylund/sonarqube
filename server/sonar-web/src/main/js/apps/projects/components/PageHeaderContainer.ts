@@ -26,4 +26,4 @@ const mapStateToProps = (state: any) => ({
   projectsAppState: getProjectsAppState(state)
 });
 
-export default connect(mapStateToProps)(PageHeader as any);
+export default connect<any, any, any>(mapStateToProps)(PageHeader);

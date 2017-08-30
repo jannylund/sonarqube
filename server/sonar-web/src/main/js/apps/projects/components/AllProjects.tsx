@@ -17,8 +17,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-//@flow
-import React from 'react';
+import * as React from 'react';
+import * as PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
 import PageHeaderContainer from './PageHeaderContainer';
 import ProjectsListContainer from './ProjectsListContainer';
@@ -29,32 +29,27 @@ import { parseUrlQuery } from '../store/utils';
 import { translate } from '../../../helpers/l10n';
 import * as utils from '../utils';
 import * as storage from '../../../helpers/storage';
-/*:: import type { RawQuery } from '../../../helpers/query'; */
+import { RawQuery } from '../../../helpers/query';
 import '../styles.css';
 
-/*::
-type Props = {|
-  isFavorite: boolean,
-  location: { pathname: string, query: RawQuery },
-  fetchProjects: (query: string, isFavorite: boolean, organization?: {}) => Promise<*>,
-  organization?: { key: string },
-  router: {
-    push: ({ pathname: string, query?: {} }) => void,
-    replace: ({ pathname: string, query?: {} }) => void
-  },
-  currentUser?: { isLoggedIn: boolean }
-|};
-*/
+interface Props {
+  isFavorite: boolean;
+  location: { pathname: string; query: RawQuery };
+  fetchProjects: (query: RawQuery, isFavorite: boolean, organization?: {}) => Promise<any>;
+  organization?: { key: string };
+  currentUser?: { isLoggedIn: boolean };
+}
 
-/*::
-type State = {
-  query: RawQuery
-};
-*/
+interface State {
+  query: RawQuery;
+}
 
-export default class AllProjects extends React.PureComponent {
-  /*:: props: Props; */
-  state /*: State */ = { query: {} };
+export default class AllProjects extends React.PureComponent<Props, State> {
+  state: State = { query: {} };
+
+  static contextTypes = {
+    router: PropTypes.object.isRequired
+  };
 
   componentDidMount() {
     this.handleQueryChange(true);
@@ -62,7 +57,7 @@ export default class AllProjects extends React.PureComponent {
     footer && footer.classList.add('page-footer-with-sidebar');
   }
 
-  componentDidUpdate(prevProps /*: Props */) {
+  componentDidUpdate(prevProps: Props) {
     if (prevProps.location.query !== this.props.location.query) {
       this.handleQueryChange(false);
     }
@@ -82,23 +77,29 @@ export default class AllProjects extends React.PureComponent {
   isFiltered = () => Object.keys(this.state.query).some(key => this.state.query[key] != null);
 
   getSavedOptions = () => {
-    const options = {};
+    const options: {
+      sort?: string;
+      view?: string;
+      visualization?: string;
+    } = {};
     if (storage.getSort()) {
-      options.sort = storage.getSort();
+      options.sort = storage.getSort() || undefined;
     }
     if (storage.getView()) {
-      options.view = storage.getView();
+      options.view = storage.getView() || undefined;
     }
     if (storage.getVisualization()) {
-      options.visualization = storage.getVisualization();
+      options.visualization = storage.getVisualization() || undefined;
     }
     return options;
   };
 
-  handlePerspectiveChange = (
-    { view, visualization } /*: { view: string, visualization?: string } */
-  ) => {
-    const query /*: { view: ?string, visualization: ?string, sort?: ?string } */ = {
+  handlePerspectiveChange = ({ view, visualization }: { view: string; visualization?: string }) => {
+    const query: {
+      view: string | undefined;
+      visualization: string | undefined;
+      sort?: string | undefined;
+    } = {
       view: view === 'overall' ? undefined : view,
       visualization
     };
@@ -110,7 +111,7 @@ export default class AllProjects extends React.PureComponent {
           query.sort = (sort.sortDesc ? '-' : '') + utils.SORTING_SWITCH[sort.sortValue];
         }
       }
-      this.props.router.push({ pathname: this.props.location.pathname, query });
+      this.context.router.push({ pathname: this.props.location.pathname, query });
     } else {
       this.updateLocationQuery(query);
     }
@@ -120,28 +121,28 @@ export default class AllProjects extends React.PureComponent {
     storage.saveVisualization(visualization);
   };
 
-  handleSortChange = (sort /*: string */, desc /*: boolean */) => {
+  handleSortChange = (sort: string, desc: boolean) => {
     const asString = (desc ? '-' : '') + sort;
     this.updateLocationQuery({ sort: asString });
     storage.saveSort(asString);
   };
 
-  handleQueryChange(initialMount /*: boolean */) {
+  handleQueryChange(initialMount: boolean) {
     const query = parseUrlQuery(this.props.location.query);
     const savedOptions = this.getSavedOptions();
     const savedOptionsSet = savedOptions.sort || savedOptions.view || savedOptions.visualization;
 
     // if there is no filter, but there are saved preferences in the localStorage
     if (initialMount && !this.isFiltered() && savedOptionsSet) {
-      this.props.router.replace({ pathname: this.props.location.pathname, query: savedOptions });
+      this.context.router.replace({ pathname: this.props.location.pathname, query: savedOptions });
     } else {
       this.setState({ query });
       this.props.fetchProjects(query, this.props.isFavorite, this.props.organization);
     }
   }
 
-  updateLocationQuery = (newQuery /*: { [string]: ?string } */) => {
-    this.props.router.push({
+  updateLocationQuery = (newQuery: RawQuery) => {
+    this.context.router.push({
       pathname: this.props.location.pathname,
       query: {
         ...this.props.location.query,

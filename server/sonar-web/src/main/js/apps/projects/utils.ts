@@ -46,7 +46,7 @@ export const SORTING_LEAK_METRICS: SortingOption[] = [
   { value: 'new_lines', class: 'projects-leak-sorting-option' }
 ];
 
-export const SORTING_SWITCH = {
+export const SORTING_SWITCH: { [x: string]: string } = {
   analysis_date: 'analysis_date',
   name: 'name',
   reliability: 'new_reliability',
