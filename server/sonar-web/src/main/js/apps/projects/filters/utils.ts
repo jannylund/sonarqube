@@ -18,17 +18,24 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { each, isNil, omitBy } from 'lodash';
+import { RawQuery } from '../../../helpers/query';
 
-export const getFilterUrl = (ownProps, part) => {
+interface OwnProps {
+  isFavorite?: boolean;
+  organization?: { key: string };
+  query: RawQuery;
+}
+
+export function getFilterUrl(ownProps: OwnProps, part: RawQuery) {
   const basePathName = ownProps.organization
     ? `/organizations/${ownProps.organization.key}/projects`
     : '/projects';
   const pathname = basePathName + (ownProps.isFavorite ? '/favorite' : '');
-  const query = omitBy({ ...ownProps.query, ...part }, isNil);
+  const query: RawQuery = omitBy({ ...ownProps.query, ...part }, isNil);
   each(query, (value, key) => {
     if (Array.isArray(value)) {
       query[key] = value.join(',');
     }
   });
   return { pathname, query };
-};
+}
