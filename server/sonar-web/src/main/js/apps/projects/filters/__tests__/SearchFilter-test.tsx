@@ -17,23 +17,42 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 import SearchFilter from '../SearchFilter';
+import { change } from '../../../../helpers/testUtils';
 
 it('should render correctly without any search query', () => {
-  const wrapper = shallow(<SearchFilter handleSearch={() => {}} query={{ search: null }} />);
+  const wrapper = shallow(<SearchFilter handleSearch={jest.fn()} query={{}} />);
   expect(wrapper).toMatchSnapshot();
 });
 
 it('should render with a search query', () => {
-  const wrapper = shallow(<SearchFilter handleSearch={() => {}} query={{ search: 'foo' }} />);
+  const wrapper = shallow(<SearchFilter handleSearch={jest.fn()} query={{ search: 'foo' }} />);
   expect(wrapper).toMatchSnapshot();
 });
 
 it('should display a help message when there is less than 2 characters', () => {
-  const wrapper = shallow(<SearchFilter handleSearch={() => {}} query={{ search: 'a' }} />);
+  const wrapper = shallow(<SearchFilter handleSearch={jest.fn()} query={{ search: 'a' }} />);
   expect(wrapper).toMatchSnapshot();
   wrapper.setState({ userQuery: 'foo' });
   expect(wrapper).toMatchSnapshot();
+});
+
+it('searches', () => {
+  const handleSearch = jest.fn();
+  const wrapper = shallow(<SearchFilter handleSearch={handleSearch} query={{}} />);
+
+  change(wrapper.find('input'), 'a');
+  expect(handleSearch).not.toBeCalled();
+
+  change(wrapper.find('input'), 'abc');
+  expect(handleSearch).toBeCalledWith('abc');
+});
+
+it('updates state to new props', () => {
+  const wrapper = shallow(<SearchFilter handleSearch={jest.fn()} query={{ search: 'abc' }} />);
+  expect(wrapper.state()).toEqual({ userQuery: 'abc' });
+  wrapper.setProps({ query: { search: 'def' } });
+  expect(wrapper.state()).toEqual({ userQuery: 'def' });
 });

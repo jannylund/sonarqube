@@ -17,50 +17,39 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
+import * as React from 'react';
 import { translate, translateWithParameters } from '../../../helpers/l10n';
 
-/*::
-type Props = {
-  className?: string,
-  handleSearch: (userString?: string) => void,
-  query: { search?: string }
-};
-*/
+interface Props {
+  className?: string;
+  handleSearch: (userString?: string) => void;
+  query: { search?: string | undefined };
+}
 
-/*::
-type State = {
-  userQuery?: string
-};
-*/
+interface State {
+  userQuery?: string;
+}
 
-export default class SearchFilter extends React.PureComponent {
-  /*:: props: Props; */
-  /*:: state: State; */
-
-  constructor(props /*: Props */) {
+export default class SearchFilter extends React.PureComponent<Props, State> {
+  constructor(props: Props) {
     super(props);
-    this.state = {
-      userQuery: props.query.search
-    };
+    this.state = { userQuery: props.query.search };
   }
 
-  componentWillReceiveProps(nextProps /*: Props */) {
+  componentWillReceiveProps(nextProps: Props) {
     if (
       this.props.query.search === this.state.userQuery &&
       nextProps.query.search !== this.props.query.search
     ) {
-      this.setState({
-        userQuery: nextProps.query.search || ''
-      });
+      this.setState({ userQuery: nextProps.query.search || '' });
     }
   }
 
-  handleQueryChange = ({ target } /*: { target: HTMLInputElement } */) => {
-    this.setState({ userQuery: target.value });
-    if (!target.value || target.value.length >= 2) {
-      this.props.handleSearch(target.value);
+  handleQueryChange = (event: React.SyntheticEvent<HTMLInputElement>) => {
+    const { value } = event.currentTarget;
+    this.setState({ userQuery: value });
+    if (!value || value.length >= 2) {
+      this.props.handleSearch(value);
     }
   };
 
