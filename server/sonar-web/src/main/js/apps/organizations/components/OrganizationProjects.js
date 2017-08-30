@@ -19,7 +19,7 @@
  */
 // @flow
 import React from 'react';
-import AllProjectsContainer from '../../projects/components/AllProjectsContainer';
+import AllProjects from '../../projects/components/AllProjects';
 
 export default class OrganizationProjects extends React.PureComponent {
   /*:: props: {
@@ -49,7 +49,7 @@ export default class OrganizationProjects extends React.PureComponent {
   render() {
     return (
       <div id="projects-page">
-        <AllProjectsContainer
+        <AllProjects
           currentUser={this.props.currentUser}
           isFavorite={false}
           location={this.props.location}

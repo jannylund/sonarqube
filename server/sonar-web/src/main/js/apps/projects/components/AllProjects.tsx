@@ -20,38 +20,43 @@
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
-import PageHeaderContainer from './PageHeaderContainer';
+import PageHeader from './PageHeader';
 import ProjectsListContainer from './ProjectsListContainer';
-import ProjectsListFooterContainer from './ProjectsListFooterContainer';
 import PageSidebar from './PageSidebar';
 import VisualizationsContainer from '../visualizations/VisualizationsContainer';
 import { parseUrlQuery } from '../store/utils';
+import ListFooter from '../../../components/controls/ListFooter';
 import { translate } from '../../../helpers/l10n';
 import * as utils from '../utils';
 import * as storage from '../../../helpers/storage';
 import { RawQuery } from '../../../helpers/query';
 import '../styles.css';
+import { Project } from '../types';
 
 interface Props {
   isFavorite: boolean;
-  location: { pathname: string; query: RawQuery };
-  fetchProjects: (query: RawQuery, isFavorite: boolean, organization?: {}) => Promise<any>;
+  location: { pathname: string; query: { [x: string]: string } };
   organization?: { key: string };
-  currentUser?: { isLoggedIn: boolean };
 }
 
 interface State {
+  loading: boolean;
+  projects?: Project[];
   query: RawQuery;
+  total?: number;
 }
 
 export default class AllProjects extends React.PureComponent<Props, State> {
-  state: State = { query: {} };
+  mounted: boolean;
+  state: State = { loading: true, query: {} };
 
   static contextTypes = {
+    currentUser: PropTypes.object.isRequired,
     router: PropTypes.object.isRequired
   };
 
   componentDidMount() {
+    this.mounted = true;
     this.handleQueryChange(true);
     const footer = document.getElementById('footer');
     footer && footer.classList.add('page-footer-with-sidebar');
@@ -64,6 +69,7 @@ export default class AllProjects extends React.PureComponent<Props, State> {
   }
 
   componentWillUnmount() {
+    this.mounted = false;
     const footer = document.getElementById('footer');
     footer && footer.classList.remove('page-footer-with-sidebar');
   }
@@ -75,6 +81,10 @@ export default class AllProjects extends React.PureComponent<Props, State> {
   getSort = () => this.state.query.sort || 'name';
 
   isFiltered = () => Object.keys(this.state.query).some(key => this.state.query[key] != null);
+
+  fetchMoreProjects = () => {
+    // FIXME
+  };
 
   getSavedOptions = () => {
     const options: {
@@ -136,8 +146,22 @@ export default class AllProjects extends React.PureComponent<Props, State> {
     if (initialMount && !this.isFiltered() && savedOptionsSet) {
       this.context.router.replace({ pathname: this.props.location.pathname, query: savedOptions });
     } else {
-      this.setState({ query });
-      this.props.fetchProjects(query, this.props.isFavorite, this.props.organization);
+      this.setState({ loading: true, query });
+      utils
+        .fetchProjects(
+          query,
+          this.props.isFavorite,
+          this.props.organization && this.props.organization.key
+        )
+        .then(response => {
+          if (this.mounted) {
+            this.setState({
+              loading: false,
+              projects: response.projects,
+              total: response.total
+            });
+          }
+        });
     }
   }
 
@@ -175,17 +199,22 @@ export default class AllProjects extends React.PureComponent<Props, State> {
     <div className="layout-page-header-panel layout-page-main-header">
       <div className="layout-page-header-panel-inner layout-page-main-header-inner">
         <div className="layout-page-main-inner">
-          <PageHeaderContainer
-            query={this.state.query}
-            isFavorite={this.props.isFavorite}
-            organization={this.props.organization}
-            onPerspectiveChange={this.handlePerspectiveChange}
-            onSortChange={this.handleSortChange}
-            selectedSort={this.getSort()}
-            currentUser={this.props.currentUser}
-            view={this.getView()}
-            visualization={this.getVisualization()}
-          />
+          {this.state.projects && (
+            <PageHeader
+              currentUser={this.context.currentUser}
+              isFavorite={this.props.isFavorite}
+              loading={this.state.loading}
+              onPerspectiveChange={this.handlePerspectiveChange}
+              onSortChange={this.handleSortChange}
+              organization={this.props.organization}
+              projects={this.state.projects}
+              query={this.state.query}
+              selectedSort={this.getSort()}
+              total={this.state.total}
+              view={this.getView()}
+              visualization={this.getVisualization()}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -207,10 +236,11 @@ export default class AllProjects extends React.PureComponent<Props, State> {
           organization={this.props.organization}
           cardType={this.getView()}
         />
-        <ProjectsListFooterContainer
-          query={this.state.query}
-          isFavorite={this.props.isFavorite}
-          organization={this.props.organization}
+        <ListFooter
+          count={this.state.projects != undefined ? this.state.projects.length : 0}
+          loadMore={this.fetchMoreProjects}
+          ready={!this.state.loading}
+          total={this.state.total != undefined ? this.state.total : 0}
         />
       </div>
     );

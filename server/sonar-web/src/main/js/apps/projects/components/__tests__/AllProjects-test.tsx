@@ -23,13 +23,8 @@ jest.mock('../ProjectsListContainer', () => ({
   }
 }));
 
-jest.mock('../ProjectsListFooterContainer', () => ({
-  default: function ProjectsListFooterContainer() {
-    return null;
-  }
-}));
-jest.mock('../PageHeaderContainer', () => ({
-  default: function PageHeaderContainer() {
+jest.mock('../PageHeader', () => ({
+  default: function PageHeader() {
     return null;
   }
 }));
@@ -39,6 +34,12 @@ jest.mock('../PageSidebar', () => ({
     return null;
   }
 }));
+
+jest.mock('../../utils', () => {
+  const utils = require.requireActual('../../utils');
+  utils.fetchProjects = jest.fn(() => Promise.resolve({ projects: [] }));
+  return utils;
+});
 
 jest.mock('../../../../helpers/storage', () => ({
   getSort: () => null,
@@ -54,21 +55,20 @@ import { mount, shallow } from 'enzyme';
 import AllProjects from '../AllProjects';
 import { getView, saveSort, saveView, saveVisualization } from '../../../../helpers/storage';
 
+const fetchProjects = require('../../utils').fetchProjects as jest.Mock<any>;
+
 beforeEach(() => {
   (getView as jest.Mock<any>).mockImplementation(() => null);
   (saveSort as jest.Mock<any>).mockClear();
   (saveView as jest.Mock<any>).mockClear();
   (saveVisualization as jest.Mock<any>).mockClear();
+  fetchProjects.mockClear();
 });
 
 it('renders', () => {
   const wrapper = shallow(
-    <AllProjects
-      fetchProjects={jest.fn()}
-      isFavorite={false}
-      location={{ pathname: '/projects', query: {} }}
-    />,
-    { context: { router: {} } }
+    <AllProjects isFavorite={false} location={{ pathname: '/projects', query: {} }} />,
+    { context: { currentUser: { isLoggedIn: true }, router: {} } }
   );
   expect(wrapper).toMatchSnapshot();
   wrapper.setState({ query: { view: 'visualizations' } });
@@ -76,8 +76,7 @@ it('renders', () => {
 });
 
 it('fetches projects', () => {
-  const fetchProjects = jest.fn();
-  mountRender({ fetchProjects });
+  mountRender();
   expect(fetchProjects).lastCalledWith(
     {
       coverage: null,
@@ -114,16 +113,16 @@ it('redirects to the saved search', () => {
 
 it('changes sort', () => {
   const push = jest.fn();
-  const wrapper = mountRender({}, push);
-  wrapper.find('PageHeaderContainer').prop<Function>('onSortChange')('size', false);
+  const wrapper = shallowRender({}, push);
+  wrapper.find('PageHeader').prop<Function>('onSortChange')('size', false);
   expect(push).lastCalledWith({ pathname: '/projects', query: { sort: 'size' } });
   expect(saveSort).lastCalledWith('size');
 });
 
 it('changes perspective to leak', () => {
   const push = jest.fn();
-  const wrapper = mountRender({}, push);
-  wrapper.find('PageHeaderContainer').prop<Function>('onPerspectiveChange')({ view: 'leak' });
+  const wrapper = shallowRender({}, push);
+  wrapper.find('PageHeader').prop<Function>('onPerspectiveChange')({ view: 'leak' });
   expect(push).lastCalledWith({
     pathname: '/projects',
     query: { view: 'leak', visualization: undefined }
@@ -135,11 +134,9 @@ it('changes perspective to leak', () => {
 
 it('updates sorting when changing perspective from leak', () => {
   const push = jest.fn();
-  const wrapper = mountRender(
-    { location: { pathname: '/projects', query: { sort: 'new_coverage', view: 'leak' } } },
-    push
-  );
-  wrapper.find('PageHeaderContainer').prop<Function>('onPerspectiveChange')({
+  const wrapper = shallowRender({}, push);
+  wrapper.setState({ query: { sort: 'new_coverage', view: 'leak' } });
+  wrapper.find('PageHeader').prop<Function>('onPerspectiveChange')({
     view: undefined
   });
   expect(push).lastCalledWith({
@@ -153,8 +150,8 @@ it('updates sorting when changing perspective from leak', () => {
 
 it('changes perspective to risk visualization', () => {
   const push = jest.fn();
-  const wrapper = mountRender({}, push);
-  wrapper.find('PageHeaderContainer').prop<Function>('onPerspectiveChange')({
+  const wrapper = shallowRender({}, push);
+  wrapper.find('PageHeader').prop<Function>('onPerspectiveChange')({
     view: 'visualizations',
     visualization: 'risk'
   });
@@ -175,6 +172,15 @@ function mountRender(props: any = {}, push: Function = jest.fn(), replace: Funct
       location={{ pathname: '/projects', query: {} }}
       {...props}
     />,
-    { context: { router: { push, replace } } }
+    { context: { currentUser: { isLoggedIn: true }, router: { push, replace } } }
   );
+}
+
+function shallowRender(props: any = {}, push: Function = jest.fn(), replace: Function = jest.fn()) {
+  const wrapper = shallow(
+    <AllProjects isFavorite={false} location={{ pathname: '/projects', query: {} }} {...props} />,
+    { context: { currentUser: { isLoggedIn: true }, router: { push, replace } } }
+  );
+  wrapper.setState({ loading: false, projects: [], total: 0 });
+  return wrapper;
 }
