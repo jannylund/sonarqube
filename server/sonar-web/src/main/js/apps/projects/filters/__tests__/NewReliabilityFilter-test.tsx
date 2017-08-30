@@ -1,7 +1,7 @@
 /*
  * SonarQube
- * Copyright (C) 2009-2017 SonarSource SA
- * mailto:info AT sonarsource DOT com
+ * Copyright (C) 2009-2016 SonarSource SA
+ * mailto:contact AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,26 +17,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
-import BugIcon from '../../../components/icons-components/BugIcon';
-import IssuesFilter from './IssuesFilter';
-import { translate } from '../../../helpers/l10n';
+import * as React from 'react';
+import { shallow } from 'enzyme';
+import NewReliabilityFilter from '../NewReliabilityFilter';
 
-export default function NewReliabilityFilter(props) {
-  return (
-    <IssuesFilter
-      {...props}
-      className="leak-facet-box"
-      headerDetail={
-        <span className="note little-spacer-left">
-          {'('}
-          <BugIcon className="little-spacer-right" />
-          {translate('metric.bugs.name')}
-          {' )'}
-        </span>
-      }
-      name="Reliability"
-      property="new_reliability"
-    />
-  );
-}
+it('renders', () => {
+  expect(shallow(<NewReliabilityFilter query={{}} />)).toMatchSnapshot();
+});
