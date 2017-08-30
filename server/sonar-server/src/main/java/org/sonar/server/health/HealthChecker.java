@@ -31,5 +31,5 @@ public interface HealthChecker {
    *
    * @throws IllegalStateException if clustering is not enabled.
    */
-  Health checkCluster();
+  ClusterHealth checkCluster();
 }

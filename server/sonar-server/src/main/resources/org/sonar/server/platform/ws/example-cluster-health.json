@@ -4,5 +4,54 @@
     {
       "message": "Application node app-1 is RED"
     }
+  ],
+  "nodes": [
+    {
+      "name": "app-1",
+      "type": "application",
+      "ip": "192.168.1.1",
+      "port": "999",
+      "startedTime": "2015-08-13T23:34:59+0200",
+      "health": "RED",
+      "causes": [
+        {
+          "message": "foo"
+        }
+      ]
+    },
+    {
+      "name": "app-2",
+      "type": "application",
+      "ip": "192.168.1.2",
+      "port": "999",
+      "startedTime": "2015-08-13T23:34:59+0200",
+      "health": "YELLOW",
+      "causes": [
+        {
+          "message": "bar"
+        }
+      ]
+    },
+    {
+      "name": "es-1",
+      "type": "search",
+      "ip": "192.168.1.3",
+      "port": "999",
+      "startedTime": "2015-08-13T23:34:59+0200"
+    },
+    {
+      "name": "es-2",
+      "type": "search",
+      "ip": "192.168.1.4",
+      "port": "999",
+      "startedTime": "2015-08-13T23:34:59+0200"
+    },
+    {
+      "name": "es-3",
+      "type": "search",
+      "ip": "192.168.1.5",
+      "port": "999",
+      "startedTime": "2015-08-13T23:34:59+0200"
+    }
   ]
 }
