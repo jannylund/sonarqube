@@ -17,20 +17,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
-import SimpleBubbleChart from './SimpleBubbleChart';
+import * as React from 'react';
+import SimpleBubbleChart, { Project } from './SimpleBubbleChart';
 
-export default class Maintainability extends React.PureComponent {
-  render() {
-    return (
-      <SimpleBubbleChart
-        {...this.props}
-        xMetric={{ key: 'ncloc', type: 'SHORT_INT' }}
-        yMetric={{ key: 'sqale_index', type: 'SHORT_WORK_DUR' }}
-        sizeMetric={{ key: 'code_smells', type: 'SHORT_INT' }}
-        colorMetric="sqale_rating"
-      />
-    );
-  }
+interface Props {
+  displayOrganizations: boolean;
+  projects: Project[];
+}
+
+export default function Security(props: Props) {
+  return (
+    <SimpleBubbleChart
+      {...props}
+      xMetric={{ key: 'ncloc', type: 'SHORT_INT' }}
+      yMetric={{ key: 'security_remediation_effort', type: 'SHORT_WORK_DUR' }}
+      sizeMetric={{ key: 'vulnerabilities', type: 'SHORT_INT' }}
+      colorMetric="security_rating"
+    />
+  );
 }

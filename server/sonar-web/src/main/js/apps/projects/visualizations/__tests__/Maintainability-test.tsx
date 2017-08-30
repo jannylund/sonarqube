@@ -1,7 +1,7 @@
 /*
  * SonarQube
- * Copyright (C) 2009-2017 SonarSource SA
- * mailto:info AT sonarsource DOT com
+ * Copyright (C) 2009-2016 SonarSource SA
+ * mailto:contact AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,20 +17,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
-import SimpleBubbleChart from './SimpleBubbleChart';
+import * as React from 'react';
+import { shallow } from 'enzyme';
+import Maintainability from '../Maintainability';
 
-export default class Reliability extends React.PureComponent {
-  render() {
-    return (
-      <SimpleBubbleChart
-        {...this.props}
-        xMetric={{ key: 'ncloc', type: 'SHORT_INT' }}
-        yMetric={{ key: 'reliability_remediation_effort', type: 'SHORT_WORK_DUR' }}
-        sizeMetric={{ key: 'bugs', type: 'SHORT_INT' }}
-        colorMetric="reliability_rating"
-      />
-    );
-  }
-}
+it('renders', () => {
+  expect(shallow(<Maintainability displayOrganizations={false} projects={[]} />)).toMatchSnapshot();
+});
