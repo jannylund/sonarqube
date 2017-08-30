@@ -17,9 +17,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
+import * as React from 'react';
 import IssuesFilter from './IssuesFilter';
 
-export default function MaintainabilityFilter(props) {
+interface Props {
+  className?: string;
+  headerDetail?: React.ReactNode;
+  isFavorite?: boolean;
+  organization?: { key: string };
+  query: { [x: string]: any };
+}
+
+export default function MaintainabilityFilter(props: Props) {
   return <IssuesFilter {...props} name="Maintainability" property="maintainability" />;
 }
