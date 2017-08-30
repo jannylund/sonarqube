@@ -17,25 +17,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-//@flow
-import React from 'react';
+import * as React from 'react';
 
-/*::
-type Props = {
-  name: string,
-  children?: React.Element<*>
-};
-*/
+interface Props {
+  children?: React.ReactNode;
+  name: string;
+}
 
-export default class FilterHeader extends React.PureComponent {
-  /*:: props: Props; */
-
-  render() {
-    return (
-      <div className="search-navigator-facet-header projects-facet-header">
-        {this.props.name}
-        {this.props.children}
-      </div>
-    );
-  }
+export default function FilterHeader(props: Props) {
+  return (
+    <div className="search-navigator-facet-header projects-facet-header">
+      {props.name}
+      {props.children}
+    </div>
+  );
 }
