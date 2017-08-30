@@ -17,8 +17,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
+import * as React from 'react';
 import ColorRatingsLegend from '../../../components/charts/ColorRatingsLegend';
 import BubbleChart from '../../../components/charts/BubbleChart';
 import { formatMeasure } from '../../../helpers/measures';
@@ -26,44 +25,36 @@ import { translate, translateWithParameters } from '../../../helpers/l10n';
 import { RATING_COLORS } from '../../../helpers/constants';
 import { getProjectUrl } from '../../../helpers/urls';
 
-/*::
-type Metric = { key: string, type: string };
-*/
+interface Metric {
+  key: string;
+  type: string;
+}
 
-/*::
-type Project = {
-  key: string,
-  measures: { [string]: string },
-  name: string,
-  organization?: { name: string }
-};
-*/
+interface Project {
+  key: string;
+  measures: { [key: string]: string };
+  name: string;
+  organization?: { name: string };
+}
 
-export default class SimpleBubbleChart extends React.PureComponent {
-  /*:: props: {
-    displayOrganizations: boolean,
-    projects: Array<Project>,
-    sizeMetric: Metric,
-    xMetric: Metric,
-    yDomain?: [number, number],
-    yMetric: Metric,
-    colorMetric?: string
-  };
-*/
+interface Props {
+  colorMetric?: string;
+  displayOrganizations: boolean;
+  projects: Project[];
+  sizeMetric: Metric;
+  xMetric: Metric;
+  yDomain?: [number, number];
+  yMetric: Metric;
+}
 
-  getMetricTooltip(metric /*: Metric */, value /*: ?number */) {
+export default class SimpleBubbleChart extends React.PureComponent<Props> {
+  getMetricTooltip(metric: Metric, value?: number) {
     const name = translate('metric', metric.key, 'name');
     const formattedValue = value != null ? formatMeasure(value, metric.type) : '–';
     return `<div>${name}: ${formattedValue}</div>`;
   }
 
-  getTooltip(
-    project /*: Project */,
-    x /*: ?number */,
-    y /*: ?number */,
-    size /*: ?number */,
-    color /*: ?number */
-  ) {
+  getTooltip(project: Project, x?: number, y?: number, size?: number, color?: number) {
     const fullProjectName =
       this.props.displayOrganizations && project.organization
         ? `${project.organization.name} / <strong>${project.name}</strong>`
@@ -77,8 +68,8 @@ export default class SimpleBubbleChart extends React.PureComponent {
     ];
 
     if (color) {
-      // $FlowFixMe if `color` is defined then `this.props.colorMetric` is defined too
-      this.getMetricTooltip({ key: this.props.colorMetric, type: 'RATING' }, color);
+      // if `color` is defined then `this.props.colorMetric` is defined too
+      this.getMetricTooltip({ key: this.props.colorMetric!, type: 'RATING' }, color);
     }
 
     return `<div class="text-left">${inner.join('')}</div>`;
@@ -91,13 +82,13 @@ export default class SimpleBubbleChart extends React.PureComponent {
       .filter(project => colorMetric == null || project.measures[colorMetric] !== null)
       .map(project => {
         const x =
-          project.measures[xMetric.key] != null ? Number(project.measures[xMetric.key]) : null;
+          project.measures[xMetric.key] != null ? Number(project.measures[xMetric.key]) : undefined;
         const y =
-          project.measures[yMetric.key] != null ? Number(project.measures[yMetric.key]) : null;
+          project.measures[yMetric.key] != null ? Number(project.measures[yMetric.key]) : undefined;
         const size =
           project.measures[sizeMetric.key] != null
             ? Number(project.measures[sizeMetric.key])
-            : null;
+            : undefined;
         const color = colorMetric ? Number(project.measures[colorMetric]) : undefined;
         return {
           x: x || 0,
@@ -110,8 +101,8 @@ export default class SimpleBubbleChart extends React.PureComponent {
         };
       });
 
-    const formatXTick = tick => formatMeasure(tick, xMetric.type);
-    const formatYTick = tick => formatMeasure(tick, yMetric.type);
+    const formatXTick = (tick: number) => formatMeasure(tick, xMetric.type);
+    const formatYTick = (tick: number) => formatMeasure(tick, yMetric.type);
 
     return (
       <div>
