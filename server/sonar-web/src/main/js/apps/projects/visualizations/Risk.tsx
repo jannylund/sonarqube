@@ -17,23 +17,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// @flow
-import React from 'react';
+import * as React from 'react';
 import ColorRatingsLegend from '../../../components/charts/ColorRatingsLegend';
 import BubbleChart from '../../../components/charts/BubbleChart';
 import { formatMeasure } from '../../../helpers/measures';
 import { translate, translateWithParameters } from '../../../helpers/l10n';
 import { RATING_COLORS } from '../../../helpers/constants';
 import { getProjectUrl } from '../../../helpers/urls';
-
-/*::
-type Project = {
-  key: string,
-  measures: { [string]: string },
-  name: string,
-  organization?: { name: string }
-};
-*/
 
 const X_METRIC = 'sqale_index';
 const X_METRIC_TYPE = 'SHORT_WORK_DUR';
@@ -45,26 +35,32 @@ const COLOR_METRIC_1 = 'reliability_rating';
 const COLOR_METRIC_2 = 'security_rating';
 const COLOR_METRIC_TYPE = 'RATING';
 
-export default class Risk extends React.PureComponent {
-  /*:: props: {
-    displayOrganizations: boolean,
-    projects: Array<Project>
-  };
-*/
+interface Project {
+  key: string;
+  measures: { [key: string]: string };
+  name: string;
+  organization?: { name: string };
+}
 
-  getMetricTooltip(metric /*: { key: string, type: string } */, value /*: ?number */) {
+interface Props {
+  displayOrganizations: boolean;
+  projects: Project[];
+}
+
+export default class Risk extends React.PureComponent<Props> {
+  getMetricTooltip(metric: { key: string; type: string }, value?: number) {
     const name = translate('metric', metric.key, 'name');
     const formattedValue = value != null ? formatMeasure(value, metric.type) : '–';
     return `<div>${name}: ${formattedValue}</div>`;
   }
 
   getTooltip(
-    project /*: Project */,
-    x /*: ?number */,
-    y /*: ?number */,
-    size /*: ?number */,
-    color1 /*: ?number */,
-    color2 /*: ?number */
+    project: Project,
+    x?: number,
+    y?: number,
+    size?: number,
+    color1?: number,
+    color2?: number
   ) {
     const fullProjectName =
       this.props.displayOrganizations && project.organization
@@ -83,14 +79,18 @@ export default class Risk extends React.PureComponent {
 
   render() {
     const items = this.props.projects.map(project => {
-      const x = project.measures[X_METRIC] != null ? Number(project.measures[X_METRIC]) : null;
-      const y = project.measures[Y_METRIC] != null ? Number(project.measures[Y_METRIC]) : null;
+      const x = project.measures[X_METRIC] != null ? Number(project.measures[X_METRIC]) : undefined;
+      const y = project.measures[Y_METRIC] != null ? Number(project.measures[Y_METRIC]) : undefined;
       const size =
-        project.measures[SIZE_METRIC] != null ? Number(project.measures[SIZE_METRIC]) : null;
+        project.measures[SIZE_METRIC] != null ? Number(project.measures[SIZE_METRIC]) : undefined;
       const color1 =
-        project.measures[COLOR_METRIC_1] != null ? Number(project.measures[COLOR_METRIC_1]) : null;
+        project.measures[COLOR_METRIC_1] != null
+          ? Number(project.measures[COLOR_METRIC_1])
+          : undefined;
       const color2 =
-        project.measures[COLOR_METRIC_2] != null ? Number(project.measures[COLOR_METRIC_2]) : null;
+        project.measures[COLOR_METRIC_2] != null
+          ? Number(project.measures[COLOR_METRIC_2])
+          : undefined;
       return {
         x: x || 0,
         y: y || 0,
@@ -104,8 +104,10 @@ export default class Risk extends React.PureComponent {
         link: getProjectUrl(project.key)
       };
     });
-    const formatXTick = tick => formatMeasure(tick, X_METRIC_TYPE);
-    const formatYTick = tick => formatMeasure(tick, Y_METRIC_TYPE);
+
+    const formatXTick = (tick: number) => formatMeasure(tick, X_METRIC_TYPE);
+    const formatYTick = (tick: number) => formatMeasure(tick, Y_METRIC_TYPE);
+
     return (
       <div>
         <BubbleChart
