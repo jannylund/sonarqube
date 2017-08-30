@@ -24,9 +24,10 @@ import {
   getProjectsAppMaxFacetValue
 } from '../../../store/rootReducer';
 
-const mapStateToProps = (state, ownProps) => ({
+const mapStateToProps = (state: any, ownProps: any) => ({
   value: ownProps.query[ownProps.property],
   facet: getProjectsAppFacetByProperty(state, ownProps.property),
   maxFacetValue: getProjectsAppMaxFacetValue(state)
 });
-export default connect(mapStateToProps)(Filter);
+
+export default connect<any, any, any>(mapStateToProps)(Filter);
